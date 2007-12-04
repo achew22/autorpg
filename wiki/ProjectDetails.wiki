@@ -1,0 +1,21 @@
+#summary What this project is/should be
+#labels Phase-Requirements
+
+= Introduction =
+
+This is based on an idea by [http://www.squidi.net/three/entry.php?id=22 Sean Howard], although I want it to go in a bit of a different direction.
+Basically, it is a miniature, full-featured 2D RPG which can be entirely automated with the computer. Your character (which can be viewed as sort of a pet) will automatically navigate dungeons, fight monsters, collect treasure, and level up through randomly generated content.
+
+
+= Details =
+
+ # For one, this one is a bit larger: 50*100 pixels, but doubled. So the images could technically be constructed of 5000 pixels, but that is really hard to look at, and so the image is blown up 2x.
+ # I also don't want it to be turn based combat. That's boring enough to play (unless it's really well done), but probably even more boring to watch. It should be mildly actiony, so the character swings a sword, shoots a bow, uses a spell, etc. against enemies in real-time.
+ # Levels should be randomly generated:
+  * The background should be a long strip of pre-made tiles, where the first and last tile in the strip have exit and entry doors, respectively. These entry doors do not necessarily lead to more levels, but will actually just lead to a new corridor in the existing level, until the character reaches (and defeats) a boss. Only then should the character proceed to the next level.
+  * Each level will be randomly populated with enemies, and made up of some random number of corridors. The idea should be that the character has a defined expected chance of success for a given level, depending on it's difficulty. At first, this should be 95% or higher, and the levels should be shorter, so that the player progresses quickly at first. Toward the end, the chance of not dying within a given level ought to be close to 30-40%, so that actually beating level 100 (the last level) will take a good long time.
+  * Bosses will have to be pre-defined (unless you happen to be really good at procedurally generated content), but the boss that the character faces at the end of the level ought to be random.
+ # The player should be able to save the game and quit, returning to it where he or she left off. The easier way to do this is simply to store the level that the character was on, and begin from there. Since the whole game is randomly generated anyway, I don't think this is a bad idea.
+ # More to come when I get time.
+
+Hopefully this helps you to understand the basics of what I'm shooting for. If you have any ideas of features to add or changes to be made to this design, [mailto:brian.shourd@gmail.com let me know]. Just remember, keep the ideas modest at first. This is mostly for fun and instruction, not to become the next generation in gaming.

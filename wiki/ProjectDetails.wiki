@@ -1,5 +1,5 @@
 #summary What this project is/should be
-#labels Phase-Requirements
+#labels Featured
 
 = Introduction =
 

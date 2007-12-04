@@ -8,23 +8,23 @@ The following problems is mostly a step-by-step "what we need to fix" before we 
 = Details =
 
 ===Problems to be fixed first:===
- *Reconstruction of the code:
-  #"ClassDeclarations.h" needs to be split into many different headers and each of the implementations need to be put into source files, instead of headers.
-  #Graphics needs to be put into a class. This is just proper, and can reduce the number of globals that we are using, especially since every other class already stores it's own pointers to necessary screens.
-  #The Global list of Dynamic Objects should be split into a few categories:
-   *Characters
-   *Things that characters can collide with
-   *Things that characters can interact with (chests)
-   *background stuff
+ * Reconstruction of the code:
+  # "`ClassDeclarations.h`" needs to be split into many different headers and each of the implementations need to be put into source files, instead of headers.
+  # Graphics needs to be put into a class. This is just proper, and can reduce the number of globals that we are using, especially since every other class already stores it's own pointers to necessary screens.
+  # The Global list of Dynamic Objects should be split into a few categories:
+   * Characters
+   * Things that characters can collide with
+   * Things that characters can interact with (chests)
+   * background stuff
   There shouldn't be any overlap between these lists. And then the Update() method of the Graphics namespace/class should be updated to update every list.
 
 ===Once these problems are fixed===
- #Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.
- #Doors should be added. More to come on the implementation of this.
- #An inventory should be added to the character, so that he can both carry and view items that he has.
- #Treasure chests should be added, presumably with treasure within them.
- #A combat system should be added. More to come on this later, as this will be the largest addition to the code.
- #Collision detection should be added. I haven't figured out a great way to do this yet, so your opinion is as good as mine.
+ # Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.
+ # Doors should be added. More to come on the implementation of this.
+ # An inventory should be added to the character, so that he can both carry and view items that he has.
+ # Treasure chests should be added, presumably with treasure within them.
+ # A combat system should be added. More to come on this later, as this will be the largest addition to the code.
+ # Collision detection should be added. I haven't figured out a great way to do this yet, so your opinion is as good as mine.
 
 ==Eventually==
 

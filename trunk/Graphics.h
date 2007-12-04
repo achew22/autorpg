@@ -41,9 +41,9 @@ bool Graphics::LoadFiles()
 {
 	background = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
 	dynamicLayer = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
-	dynamicSprites = LoadImage("dynamicobjects2x.png", 0, 0xFF, 0xFF);
-	bgTiles = LoadImage("bgTiles2x.png", 0, 0, 0xFF);
-	characters = LoadImage("miniDungeonCharSprites2x.png", 0xFF, 0, 0);
+	dynamicSprites = LoadImage("images/dynamicobjects2x.png", 0, 0xFF, 0xFF);
+	bgTiles = LoadImage("images/bgTiles2x.png", 0, 0, 0xFF);
+	characters = LoadImage("images/miniDungeonCharSprites2x.png", 0xFF, 0, 0);
 	if ((dynamicSprites == NULL) || (bgTiles == NULL) || (characters == NULL)) {return false;}
 	return true;
 }

@@ -1,4 +1,8 @@
 #include "include.h"
+#include "Graphics.h"
+#include "Character.h"
+#include "Dynamic_Object.h"
+#include "Torch.h"
 #include <stdio.h>
 
 void SetUpDynamicObjects()

@@ -24,7 +24,7 @@ SDL_Surface *dynamicLayer = NULL;
 
 std::vector<Dynamic_Object*> allDynamicObjects;
 
-Dynamic_Object *hero = NULL;
+Character *hero = NULL;
 
 #include "BG_Item.h"
 #include "Graphics.h"

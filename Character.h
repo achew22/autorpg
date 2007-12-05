@@ -1,8 +1,8 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-Character::Character(int locx, int locy, int width, int height, 
-					 SDL_Surface *surface) : Dynamic_Object(locx, locy, 
+Character::Character(int locx, int locy, int width, int height,
+					 SDL_Surface *surface) : Dynamic_Object(locx, locy,
 					 width, height, surface)
 {
 	flagList.push_back(0);	//Moving flag: 0-not, 1-right, -1-left
@@ -25,8 +25,8 @@ void Character::AddAnimation(Animation animation)
 
 void Character::Update()
 {
-	posx += velx;
-	posy += vely;
+	posx += velx/5;
+	posy += vely/5;
 	if (posx < 0)
 	{
 		posx = 0;
@@ -38,8 +38,8 @@ void Character::Update()
 	x = int(posx);
 	y = int(posy);
 
-	animationLoc += flagList[0]/50.0;
-	if (flagList[0] > 0)
+	animationLoc += velx/50.0;
+	if (velx > 0)
 	{
 		flagList[1] = 1;
 		if (animationLoc >= 4)
@@ -49,7 +49,7 @@ void Character::Update()
 		Graphics::ApplyImage(x, y, objectSurface, dynamicLayer,
 			&animList[1][int(floor(animationLoc))]);
 	}
-	else if (flagList[0] < 0)
+	else if (velx < 0)
 	{
 		flagList[1] = -1;
 		if (animationLoc < 0)
@@ -72,10 +72,20 @@ void Character::Update()
 	}
 }
 
-void Character::ApplyForce(double forcex, double forcey)
+void Character::SetVelocity(double x, double y)
 {
-	accx = forcex/mass;
-	accy = forcey/mass;
+	velx = x;
+	vely = y;
+}
+
+double Character::GetVelocityX()
+{
+    return velx;
+}
+
+double Character::GetVelocityY()
+{
+    return vely;
 }
 
 #endif

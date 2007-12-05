@@ -8,4 +8,5 @@ If you have any ideas for this game, post them here. They could be something sim
 
 = Ideas: =
 
- # None so far.
+ # Tomagachi style linking of multiple sites through TCP/IP interface
+ # AutoRPG servers could be distributed and would allow for battles between players randomly

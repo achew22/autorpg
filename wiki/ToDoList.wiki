@@ -11,8 +11,9 @@ The following problems is mostly a step-by-step "what we need to fix" before we 
 ===Problems to be fixed first:===
  * Reconstruction of the code:
   # ~~"`ClassDeclarations.h`" needs to be split into many different headers and each of the implementations need to be put into source files, instead of headers.~~ Done 12/5
-  # ~~Graphics needs to be put into a class. This is just proper, and can reduce the number of globals that we are using, especially since every other class already stores it's own pointers to necessary screens.~~ Done 12/5 (but not shown yet in the SVN)
-  # ~~The Global list of Dynamic Objects should be split into a few [linked?] lists:~~ Done 12/5 (but not shown yet in the SVN)
+  # ~~Graphics needs to be put into a class. This is just proper, and can reduce the number of globals that we are using, especially since every other class already stores it's own pointers to necessary screens.~~ Done 12/5
+  # ~~The Global list of Dynamic Objects should be split into a few [linked?] lists:~~ Done 12/5
+  # The Global lists need to be implemented as static, public members of their respective classes. This means that we will need some new classes to inherit from Dynamic_Objects: backgroundObject and interactObject. Torch should inherit from backgroundObject.
 
 ===Once these problems are fixed===
  # Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.

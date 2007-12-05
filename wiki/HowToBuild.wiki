@@ -1,5 +1,5 @@
 #summary How to build the program
-#labels Featured
+#labels Phase-Deploy
 
 = Dependencies =
 

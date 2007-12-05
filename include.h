@@ -7,6 +7,7 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include <vector>
+#include <list>
 #include <math.h>
 #include <string>
 
@@ -18,24 +19,13 @@ const int SCREEN_BPP = 32;	//Screen BPP
 
 SDL_Event SDLEvent;	//The main event that we poll to get key presses, releases, etc.
 
-SDL_Surface *screen = NULL;	//The main display screen for the game
-SDL_Surface *dynamicLayer = NULL;
-	//A very important surface. All of the dynamic objects should update to this surface, in order from
-	//back to front. This surface will eventually be blitted to the screen, but only at the very last possible
-	//moment.
-SDL_Surface *background = NULL;	//The main background surface for the game
-SDL_Surface *dynamicSprites = NULL;
-	//The surface containing all of the spritesheets for dynamic objects, except for the characters
-SDL_Surface *bgTiles = NULL;
-	//The surface containing all of the tiles used to populate the background
-SDL_Surface *characters = NULL;
-	//The surface containing all of the sprites necessary to create the characters
-
 class Dynamic_Object;	//Forward declaration of this class, so that the below doesn't get mad
-std::vector<Dynamic_Object*> allDynamicObjects;
-	//The list of all dynamic objects created in the game.
-
 class Character;	//Forward declaration of this class, so that the below doesn't get mad
+std::vector<Dynamic_Object*> interactObjectList;
+std::vector<Dynamic_Object*> backgroundObjectList;
+std::list<Dynamic_Object*> collisionList;
+	//The lists of all dynamic objects created in the game.
+
 Character *hero = NULL;	//A pointer to the hero instance of the character class
 
 #endif

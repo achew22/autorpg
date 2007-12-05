@@ -4,8 +4,8 @@
 #include "Character.h"
 
 Character::Character(int locx, int locy, int width, int height,
-					 SDL_Surface *surface) : Dynamic_Object(locx, locy,
-					 width, height, surface)
+					 SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) : Dynamic_Object(locx, locy,
+					 width, height, sourceSurface, destinationSurface)
 {
 	flagList.push_back(0);	//Facing flag: 1-right, -1-left, (0-right)
 	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
@@ -17,6 +17,8 @@ Character::Character(int locx, int locy, int width, int height,
 	accx = 0;
 	accy = 0;
 	mass = 100;
+
+	characterList.push_back(this);
 }
 
 void Character::AddAnimation(Animation animation)
@@ -54,7 +56,7 @@ void Character::Update()
 		{
 			animationLoc -= animList[ANIM_MOVERIGHT].size();
 		}
-		Graphics::ApplyImage(x, y, objectSurface, dynamicLayer,
+		Graphics::ApplyImage(x, y, source, destination,
 			&animList[ANIM_MOVERIGHT][int(floor(animationLoc))]);
 	}
 
@@ -66,7 +68,7 @@ void Character::Update()
 		{
 			animationLoc += animList[ANIM_MOVELEFT].size();
 		}
-		Graphics::ApplyImage(x, y, objectSurface, dynamicLayer,
+		Graphics::ApplyImage(x, y, source, destination,
 			&animList[ANIM_MOVELEFT][int(floor(animationLoc))]);
 	}
 
@@ -75,11 +77,11 @@ void Character::Update()
 	{
 		if (flagList[FLAG_FACING] >= 0)	//Facing right
 		{
-			Graphics::ApplyImage(x, y, objectSurface, dynamicLayer, &animList[ANIM_MOVERIGHT][1]);
+			Graphics::ApplyImage(x, y, source, destination, &animList[ANIM_MOVERIGHT][1]);
 		}
 		else	//Facing left
 		{
-			Graphics::ApplyImage(x, y, objectSurface, dynamicLayer, &animList[ANIM_MOVELEFT].GetFirstClip());
+			Graphics::ApplyImage(x, y, source, destination, &animList[ANIM_MOVELEFT].GetFirstClip());
 		}
 	}
 }

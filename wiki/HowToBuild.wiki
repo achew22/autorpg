@@ -1,0 +1,11 @@
+#summary How to build the program
+#labels Featured
+
+= Dependencies =
+
+AutoRPG depends on [http://www.libsdl.org SDL] and [http://www.libsdl.org/projects/SDL_image/ SDL_image]. If you need help figuring out how to install these, check out [http://lazyfoo.net/SDL_tutorials/lesson01/index.php Lazy Foo]. He also has instructions on installing [http://lazyfoo.net/SDL_tutorials/lesson03/index.php libraries].
+
+
+= Compiling =
+
+Organize the code with all of the sources, headers, and the image folder in the same directory. No big deal.

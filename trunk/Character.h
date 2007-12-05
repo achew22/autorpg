@@ -1,91 +1,35 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-Character::Character(int locx, int locy, int width, int height,
-					 SDL_Surface *surface) : Dynamic_Object(locx, locy,
-					 width, height, surface)
+#include "include.h"
+#include "Dynamic_Object.h"
+//The class for any and all characters in the game.
+class Character : public Dynamic_Object
 {
-	flagList.push_back(0);	//Moving flag: 0-not, 1-right, -1-left
-	flagList.push_back(0);	//Facing flag: 1-right, -1-left, (0-right)
-	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
-
-	posx = locx;
-	posy = locy;
-	velx = 0;
-	vely = 0;
-	accx = 0;
-	accy = 0;
-	mass = 100;
-}
-
-void Character::AddAnimation(Animation animation)
-{
-	animList.push_back(animation);
-}
-
-void Character::Update()
-{
-	posx += velx/5;
-	posy += vely/5;
-	if (posx < 0)
+private:
+	double posx, posy;	//Position
+	double velx, vely;	//Velocity
+	double accx, accy;	//Acceleration
+	double mass;	//Mass
+	enum
 	{
-		posx = 0;
-	}
-	else if (posx + w > 4000)
+		FLAG_FACING,	//The flag indicating which way the character is facing
+		FLAG_AUTOPILOT,	//The flag indicating whether or not the AI should control this character
+	};
+	enum
 	{
-		posx = 4000 - w;
-	}
-	x = int(posx);
-	y = int(posy);
-
-	animationLoc += velx/50.0;
-	if (velx > 0)
-	{
-		flagList[1] = 1;
-		if (animationLoc >= 4)
-		{
-			animationLoc -= 4;
-		}
-		Graphics::ApplyImage(x, y, objectSurface, dynamicLayer,
-			&animList[1][int(floor(animationLoc))]);
-	}
-	else if (velx < 0)
-	{
-		flagList[1] = -1;
-		if (animationLoc < 0)
-		{
-			animationLoc += 4;
-		}
-		Graphics::ApplyImage(x, y, objectSurface, dynamicLayer,
-			&animList[0][int(floor(animationLoc))]);
-	}
-	else
-	{
-		if (flagList[1] >= 0)
-		{
-			Graphics::ApplyImage(x, y, objectSurface, dynamicLayer, &animList[1][1]);
-		}
-		else
-		{
-			Graphics::ApplyImage(x, y, objectSurface, dynamicLayer, &animList[0].GetFirstClip());
-		}
-	}
-}
-
-void Character::SetVelocity(double x, double y)
-{
-	velx = x;
-	vely = y;
-}
-
-double Character::GetVelocityX()
-{
-    return velx;
-}
-
-double Character::GetVelocityY()
-{
-    return vely;
-}
+		ANIM_MOVELEFT,  //The animations corresponding to moving left
+		ANIM_MOVERIGHT, //and right
+	};
+public:
+	Character(int locx, int locy, int width, int height, SDL_Surface *surface);
+	virtual void AddAnimation(Animation animation);
+	virtual void Update();	//Updates the position based on velocity and acceleration, as well as updates
+							//the surface on which the character should be updated
+	void SetVelocity(double x, double y);	//Set the velocity
+	double GetVelocityX();	//Returns the x velocity
+	double GetVelocityY();	//Returns the y velocity
+	void SetAcceleration(double x, double y); //Set the acceleration
+};
 
 #endif

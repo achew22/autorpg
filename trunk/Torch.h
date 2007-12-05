@@ -8,7 +8,7 @@ class Torch : public Dynamic_Object
 {
 private:
 public:
-	Torch(int x, SDL_Surface *surface);
+	Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
 	virtual void Update();
 };
 

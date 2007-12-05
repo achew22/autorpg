@@ -1,15 +1,16 @@
 #include "Animation.h"
 #include "Dynamic_Object.h"
 
-Dynamic_Object::Dynamic_Object(int posx, int posy, int width, int height, SDL_Surface *location)
+Dynamic_Object::Dynamic_Object(int posx, int posy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
 {
 	x = posx;
 	y = posy;
 	w = width;
 	h = height;
-	objectSurface = location;
+	source = sourceSurface;
+	destination = destinationSurface;
 	animationLoc = 0;
-	
+
 	animList.clear();	//Just make sure that these are all clear
 	flagList.clear();
 }

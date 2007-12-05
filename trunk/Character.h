@@ -3,6 +3,7 @@
 
 #include "include.h"
 #include "Dynamic_Object.h"
+#include "Animation.h"
 //The class for any and all characters in the game.
 class Character : public Dynamic_Object
 {
@@ -15,14 +16,12 @@ private:
 	{
 		FLAG_FACING,	//The flag indicating which way the character is facing
 		FLAG_AUTOPILOT,	//The flag indicating whether or not the AI should control this character
-	};
-	enum
-	{
-		ANIM_MOVELEFT,  //The animations corresponding to moving left
+		ANIM_MOVELEFT = 0,  //The animations corresponding to moving left
 		ANIM_MOVERIGHT, //and right
 	};
 public:
-	Character(int locx, int locy, int width, int height, SDL_Surface *surface);
+	Character(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
+    static std::list<Character*> characterList;
 	virtual void AddAnimation(Animation animation);
 	virtual void Update();	//Updates the position based on velocity and acceleration, as well as updates
 							//the surface on which the character should be updated

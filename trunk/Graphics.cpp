@@ -1,6 +1,7 @@
 #include "Character.h"
 #include "Dynamic_Object.h"
 #include "Graphics.h"
+#include "Torch.h"
 
 //Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
 //transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
@@ -77,6 +78,24 @@ void Graphics::CleanUp()
 	{
 		SDL_FreeSurface(dynamicLayer);
 	}
+
+	//Manually free all of the dynamic objects created with "new"
+	for (std::vector<Dynamic_Object*>::iterator i = interactObjectList.begin(); i != interactObjectList.end(); i++)
+	{
+		delete *i;
+	}
+	interactObjectList.clear();
+	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); i++)
+	{
+		delete *i;
+	}
+	backgroundObjectList.clear();
+	for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
+	{
+		delete *i;
+	}
+	Character::characterList.clear();
+
 	SDL_Quit();
 }
 
@@ -101,7 +120,7 @@ void Graphics::CreateBackground()
 	SDL_FreeSurface(bgTiles);
 }
 
-//Updates every item in the allDynamicObjects list, if it is within 400 pixels of the screen. It then flips the buffers to display the frame.
+//Updates every item in the allDynamicObjects list, if it is within 100 pixels of the screen. It then flips the buffers to display the frame.
 //Returns false if an error occurs
 bool Graphics::Update()
 {
@@ -135,17 +154,37 @@ bool Graphics::Update()
 	//Apply the background to the dynamicLayer
 	ApplyImage(0, 0, background, dynamicLayer);
 
-	//Check every dynamicObject in our main list to see if it is close enough to the screen to warrant an update
+	//Check every dynamicObject in our main lists to see if it is close enough to the screen to warrant an update
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
 	//yet fixed this problem
-	for (int i = int(allDynamicObjects.size()) - 1; i >= 0; i--)
+	for (std::list<Character*>::iterator i = Character::characterList.end(); i != Character::characterList.begin(); --i)
 	{
 		int x, y;
-		allDynamicObjects[i]->GetPosition(x, y);
+		(*i)->GetPosition(x, y);
 		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
 			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
 		{
-			allDynamicObjects[i]->Update();
+			(*i)->Update();
+		}
+	}
+	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); ++i)
+	{
+		int x, y;
+		(*i)->GetPosition(x, y);
+		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
+			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
+		{
+			(*i)->Update();
+		}
+	}
+	for (std::vector<Dynamic_Object*>::iterator i = interactObjectList.begin(); i != interactObjectList.end(); ++i)
+	{
+		int x, y;
+		(*i)->GetPosition(x, y);
+		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
+			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
+		{
+			(*i)->Update();
 		}
 	}
 
@@ -155,4 +194,103 @@ bool Graphics::Update()
 	//Flip the buffers and return false if this fails
 	if (SDL_Flip(screen) == -1) {return false;}
 	return true;
+}
+
+void Graphics::SetUpDynamicObjects()
+{
+	Character *newHero = new Character(20, 32, 48, 64, characters, dynamicLayer);
+	std::vector<SDL_Rect> heroAnimRight;
+	heroAnimRight.resize(4);
+	heroAnimRight[0].x = 0;
+	heroAnimRight[0].y = 64;
+	heroAnimRight[0].w = 48;
+	heroAnimRight[0].h = 64;
+
+	heroAnimRight[1].x = 48;
+	heroAnimRight[1].y = 64;
+	heroAnimRight[1].w = 48;
+	heroAnimRight[1].h = 64;
+
+	heroAnimRight[2].x = 96;
+	heroAnimRight[2].y = 64;
+	heroAnimRight[2].w = 48;
+	heroAnimRight[2].h = 64;
+
+	heroAnimRight[3] = heroAnimRight[1];
+
+	std::vector<SDL_Rect> heroAnimLeft;
+	heroAnimLeft.resize(4);
+	heroAnimLeft[0].x = 48;
+	heroAnimLeft[0].y = 192;
+	heroAnimLeft[0].w = 48;
+	heroAnimLeft[0].h = 64;
+
+	heroAnimLeft[1].x = 0;
+	heroAnimLeft[1].y = 192;
+	heroAnimLeft[1].w = 48;
+	heroAnimLeft[1].h = 64;
+
+	heroAnimLeft[2] = heroAnimLeft[0];
+
+	heroAnimLeft[3].x = 96;
+	heroAnimLeft[3].y = 192;
+	heroAnimLeft[3].w = 48;
+	heroAnimLeft[3].h = 64;
+
+	newHero->AddAnimation(heroAnimLeft);
+	newHero->AddAnimation(heroAnimRight);
+
+	hero = newHero;
+
+	for (int i=0; i<10; i++)
+	{
+		Character *newEnemy = new Character(400*i, 32, 48, 64, characters, dynamicLayer);
+		std::vector<SDL_Rect> enemyAnimRight;
+		enemyAnimRight.resize(4);
+		enemyAnimRight[0].x = 0;
+		enemyAnimRight[0].y = 64;
+		enemyAnimRight[0].w = 48;
+		enemyAnimRight[0].h = 64;
+
+		enemyAnimRight[1].x = 48;
+		enemyAnimRight[1].y = 64;
+		enemyAnimRight[1].w = 48;
+		enemyAnimRight[1].h = 64;
+
+		enemyAnimRight[2].x = 96;
+		enemyAnimRight[2].y = 64;
+		enemyAnimRight[2].w = 48;
+		enemyAnimRight[2].h = 64;
+
+		enemyAnimRight[3] = enemyAnimRight[1];
+
+		std::vector<SDL_Rect> enemyAnimLeft;
+		enemyAnimLeft.resize(4);
+		enemyAnimLeft[0].x = 48;
+		enemyAnimLeft[0].y = 192;
+		enemyAnimLeft[0].w = 48;
+		enemyAnimLeft[0].h = 64;
+
+		enemyAnimLeft[1].x = 0;
+		enemyAnimLeft[1].y = 192;
+		enemyAnimLeft[1].w = 48;
+		enemyAnimLeft[1].h = 64;
+
+		enemyAnimLeft[2] = enemyAnimLeft[0];
+
+		enemyAnimLeft[3].x = 96;
+		enemyAnimLeft[3].y = 192;
+		enemyAnimLeft[3].w = 48;
+		enemyAnimLeft[3].h = 64;
+
+		newEnemy->AddAnimation(enemyAnimLeft);
+		newEnemy->AddAnimation(enemyAnimRight);
+		newEnemy->SetVelocity(-1, 0);
+	}
+
+	for (int i=0; i<40; i++)
+	{
+		Dynamic_Object *newTorch = new Torch(100*i + 48, dynamicSprites, dynamicLayer);
+		backgroundObjectList.push_back(newTorch);
+	}
 }

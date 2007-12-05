@@ -69,8 +69,10 @@ public:
 	Character(int locX, int locY, int width, int height, SDL_Surface *surface);
 	virtual void AddAnimation(Animation animation);
 	void Update();
-	void ApplyForce(double forcex, double forcey);
-	void ApplyAcceleration(double accelx, double accely);
+	void SetVelocity(double x, double y);
+	double GetVelocityX();
+	double GetVelocityY();
+	void SetAcceleration(double x, double y);
 };
 
 namespace Graphics

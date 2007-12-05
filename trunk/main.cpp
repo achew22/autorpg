@@ -3,7 +3,7 @@
 
 void SetUpDynamicObjects()
 {
-	Dynamic_Object *newHero = new Character(20, 32, 48, 64, characters);
+	Character *newHero = new Character(20, 32, 48, 64, characters);
 	std::vector<SDL_Rect> heroAnimRight;
 	heroAnimRight.resize(4);
 	heroAnimRight[0].x = 0;
@@ -15,7 +15,7 @@ void SetUpDynamicObjects()
 	heroAnimRight[1].y = 64;
 	heroAnimRight[1].w = 48;
 	heroAnimRight[1].h = 64;
-	
+
 	heroAnimRight[2].x = 96;
 	heroAnimRight[2].y = 64;
 	heroAnimRight[2].w = 48;
@@ -46,11 +46,11 @@ void SetUpDynamicObjects()
 	newHero->AddAnimation(heroAnimRight);
 
 	hero = newHero;
-	allDynamicObjects.push_back(newHero);
+	allDynamicObjects.push_back( (Dynamic_Object*)newHero);
 
 	for (int i=0; i<10; i++)
 	{
-		Dynamic_Object *newEnemy = new Character(400*i, 32, 48, 64, characters);
+		Character *newEnemy = new Character(400*i, 32, 48, 64, characters);
 		std::vector<SDL_Rect> enemyAnimRight;
 		enemyAnimRight.resize(4);
 		enemyAnimRight[0].x = 0;
@@ -62,7 +62,7 @@ void SetUpDynamicObjects()
 		enemyAnimRight[1].y = 64;
 		enemyAnimRight[1].w = 48;
 		enemyAnimRight[1].h = 64;
-		
+
 		enemyAnimRight[2].x = 96;
 		enemyAnimRight[2].y = 64;
 		enemyAnimRight[2].w = 48;
@@ -91,9 +91,9 @@ void SetUpDynamicObjects()
 
 		newEnemy->AddAnimation(enemyAnimLeft);
 		newEnemy->AddAnimation(enemyAnimRight);
-		newEnemy->SetFlag(0, -1);
+		newEnemy->SetVelocity(-1, 0);
 
-		allDynamicObjects.push_back(newEnemy);
+		allDynamicObjects.push_back( (Dynamic_Object*)newEnemy);
 	}
 
 	for (int i=0; i<40; i++)
@@ -115,16 +115,18 @@ bool HandleEvents()
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:
-					hero->SetFlag(0, 1);
+					hero->SetVelocity(1, 0);
 					if (!Graphics::Update()) {return false;}
 					break;
 				case SDLK_LEFT:
-					hero->SetFlag(0, -1);
+					hero->SetVelocity(-1, 0);
 					if (!Graphics::Update()) {return false;}
 					break;
 				case SDLK_ESCAPE:
 					quit = true;
 					break;
+                default:
+                    break;
 				}
 			}
 			else if (SDLEvent.type == SDL_KEYUP)
@@ -132,19 +134,21 @@ bool HandleEvents()
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:
-					if (hero->GetFlag(0) == 1)
+					if (hero->GetVelocityX() > 0)
 					{
-						hero->SetFlag(0, 0);
+						hero->SetVelocity(0, 0);
 					}
 					if (!Graphics::Update()) {return false;}
 					break;
 				case SDLK_LEFT:
-					if (hero->GetFlag(0) == -1)
+					if (hero->GetVelocityX() < 0)
 					{
-						hero->SetFlag(0, 0);
+						hero->SetVelocity(0, 0);
 					}
 					if (!Graphics::Update()) {return false;}
 					break;
+                default:
+                    break;
 				}
 			}
 			else if (SDLEvent.type == SDL_QUIT)

@@ -16,6 +16,7 @@ The following problems is mostly a step-by-step "what we need to fix" before we 
   # The Global lists need to be implemented as static, public members of their respective classes. This means that we will need some new classes to inherit from `Dynamic_Object`: `Background_Object` and `Interact_Object`. `Torch` should inherit from `Background_Object`.
 
 ===Once these problems are fixed===
+ # Add some treasure chests for the character to open, with items inside.
  # Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.
  # Doors should be added. More to come on the implementation of this.
  # An inventory should be added to the character, so that he can both carry and view items that he has.

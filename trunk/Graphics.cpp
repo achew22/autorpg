@@ -2,6 +2,12 @@
 #include "Dynamic_Object.h"
 #include "Graphics.h"
 #include "Torch.h"
+    SDL_Surface *Graphics::screen;
+    SDL_Surface *Graphics::dynamicLayer;
+    SDL_Surface *Graphics::background;
+    SDL_Surface *Graphics::dynamicSprites;
+    SDL_Surface *Graphics::bgTiles;
+    SDL_Surface *Graphics::characters;
 
 //Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
 //transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
@@ -157,15 +163,17 @@ bool Graphics::Update()
 	//Check every dynamicObject in our main lists to see if it is close enough to the screen to warrant an update
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
 	//yet fixed this problem
-	for (std::list<Character*>::iterator i = Character::characterList.end(); i != Character::characterList.begin(); --i)
+	int j=0;
+	for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
 	{
-		int x, y;
+		int x = 0, y = 0;
 		(*i)->GetPosition(x, y);
 		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
 			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
 		{
 			(*i)->Update();
 		}
+		j++;
 	}
 	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); ++i)
 	{
@@ -187,7 +195,6 @@ bool Graphics::Update()
 			(*i)->Update();
 		}
 	}
-
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
 

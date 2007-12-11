@@ -21,7 +21,7 @@ public:
 	Dynamic_Object(int posx, int posy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
 	virtual void Update() {};	//The pure virtual function to update all relevant information about the object
 	virtual void AddAnimation(Animation anim);	//Add an animation to the list
-	void GetPosition(int &posx, int &posy);	//Get the current position
+	virtual void GetPosition(int &posx, int &posy);	//Get the current position
 	bool SetFlag(int index, int value);	//Set one of the flags to a value
 	int GetFlag(int index);	//Return the value of one of the flags
 };

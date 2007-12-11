@@ -1,7 +1,9 @@
+#include "Character.h"
 #include "Animation.h"
 #include "Dynamic_Object.h"
 #include "Graphics.h"
-#include "Character.h"
+
+std::list<Character*> Character::characterList;
 
 Character::Character(int locx, int locy, int width, int height,
 					 SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) : Dynamic_Object(locx, locy,
@@ -90,6 +92,12 @@ void Character::SetVelocity(double x, double y)
 {
 	velx = x;
 	vely = y;
+}
+
+void Character::GetPosition(int &posx, int &posy)
+{
+	posx = x;
+	posy = y;
 }
 
 double Character::GetVelocityX()

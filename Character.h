@@ -26,6 +26,7 @@ public:
 	virtual void Update();	//Updates the position based on velocity and acceleration, as well as updates
 							//the surface on which the character should be updated
 	void SetVelocity(double x, double y);	//Set the velocity
+	virtual void GetPosition(int &posx, int &posy);
 	double GetVelocityX();	//Returns the x velocity
 	double GetVelocityY();	//Returns the y velocity
 	void SetAcceleration(double x, double y); //Set the acceleration

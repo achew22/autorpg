@@ -5,15 +5,6 @@
 #include "Torch.h"
 #include <stdio.h>
 
-SDL_Event SDLEvent;	//The main event that we poll to get key presses, releases, etc.
-
-class Dynamic_Object;	//Forward declaration of this class, so that the below doesn't get mad
-class Character;	//Forward declaration of this class, so that the below doesn't get mad
-std::vector<Dynamic_Object*> interactObjectList;
-std::vector<Dynamic_Object*> backgroundObjectList;
-std::list<Dynamic_Object*> collisionList;
-	//The lists of all dynamic objects created in the game.
-
 Character *hero = NULL;	//A pointer to the hero instance of the character class
 
 int main(int argc, char *args[])
@@ -25,24 +16,27 @@ int main(int argc, char *args[])
 	graphics->CreateBackground();
 	if (!graphics->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
 
+    SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
+    int time = 0;
 	while (quit != true)
 	{
+	    time = SDL_GetTicks();  //This is the current time since initialization, in milliseconds (used for capping the frame rate)
 		if (SDL_PollEvent(&SDLEvent))
 		{
 			if (SDLEvent.type == SDL_KEYDOWN)
 			{
 				switch (SDLEvent.key.keysym.sym)
 				{
-				case SDLK_RIGHT:
+				case SDLK_RIGHT:    //Right button pressed
 					hero->SetVelocity(1, 0);
-					if (!graphics->Update()) {return 1;}
+//					if (!graphics->Update()) {return 1;}
 					break;
-				case SDLK_LEFT:
+				case SDLK_LEFT:     //Left button pressed
 					hero->SetVelocity(-1, 0);
-					if (!graphics->Update()) {return 1;}
+//					if (!graphics->Update()) {return 1;}
 					break;
-				case SDLK_ESCAPE:
+				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
                 default:
@@ -53,19 +47,19 @@ int main(int argc, char *args[])
 			{
 				switch (SDLEvent.key.keysym.sym)
 				{
-				case SDLK_RIGHT:
-					if (hero->GetVelocityX() > 0)
+				case SDLK_RIGHT:    //Right button released
+					if (hero->GetVelocityX() > 0)   //If you were moving right
 					{
-						hero->SetVelocity(0, 0);
+						hero->SetVelocity(0, 0);    //Stop moving right
 					}
-					if (!graphics->Update()) {return 1;}
+//					if (!graphics->Update()) {return 1;}    //Update
 					break;
-				case SDLK_LEFT:
-					if (hero->GetVelocityX() < 0)
+				case SDLK_LEFT:     //Left button released
+					if (hero->GetVelocityX() < 0)   //If you were moving left
 					{
-						hero->SetVelocity(0, 0);
+						hero->SetVelocity(0, 0);    //Stop moving left
 					}
-					if (!graphics->Update()) {return 1;}
+//					if (!graphics->Update()) {return 1;}    //Update
 					break;
                 default:
                     break;
@@ -73,13 +67,17 @@ int main(int argc, char *args[])
 			}
 			else if (SDLEvent.type == SDL_QUIT)
 			{
-				quit = true;
+				quit = true;    //If the person "X"'s out of the window
 			}
 		}
-		if (!graphics->Update()) {return 1;}
+		if (!graphics->Update()) {return 1;}    //Update
+		if (SDL_GetTicks() - time <= 1000.0/FPS)    //Capping the frame rate: if not enough time has passed
+		{
+		    SDL_Delay(1000.0/FPS - SDL_GetTicks() + time);  //Then wait until enough time has passed
+		}
 	}
 
-	graphics->CleanUp();
+	graphics->CleanUp();    //Clean up all dynamically allocated memory
 	delete graphics;
 
 	return 0;

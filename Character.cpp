@@ -109,3 +109,12 @@ double Character::GetVelocityY()
 {
     return vely;
 }
+
+void Character::CleanUp()
+{
+    for (std::list<Character*>::iterator i = characterList.begin(); i != characterList.end(); i++)
+	{
+		delete *i;
+	}
+	characterList.clear();
+}

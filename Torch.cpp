@@ -3,7 +3,7 @@
 #include "Torch.h"
 
 //The constructor automatically assumes that it knows where the animations live, and sets them up for the torch.
-Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) : Dynamic_Object(x, 26, 50, 50, sourceSurface, destinationSurface)
+Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) : Background_Object(x, 26, 50, 50, sourceSurface, destinationSurface)
 {
 	std::vector<SDL_Rect> newAnim;
 	SDL_Rect newClip1;

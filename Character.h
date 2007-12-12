@@ -4,14 +4,17 @@
 #include "include.h"
 #include "Dynamic_Object.h"
 #include "Animation.h"
+#include "Graphics.h"
 //The class for any and all characters in the game.
 class Character : public Dynamic_Object
 {
+friend bool Graphics::Update();
 private:
 	double posx, posy;	//Position
 	double velx, vely;	//Velocity
 	double accx, accy;	//Acceleration
 	double mass;	//Mass
+    static std::list<Character*> characterList;
 	enum
 	{
 		FLAG_FACING,	//The flag indicating which way the character is facing
@@ -21,12 +24,12 @@ private:
 	};
 public:
 	Character(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
-    static std::list<Character*> characterList;
 	virtual void AddAnimation(Animation animation);
 	virtual void Update();	//Updates the position based on velocity and acceleration, as well as updates
 							//the surface on which the character should be updated
+    virtual void GetPosition(int &posx, int &posy);
+    static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
 	void SetVelocity(double x, double y);	//Set the velocity
-	virtual void GetPosition(int &posx, int &posy);
 	double GetVelocityX();	//Returns the x velocity
 	double GetVelocityY();	//Returns the y velocity
 	void SetAcceleration(double x, double y); //Set the acceleration

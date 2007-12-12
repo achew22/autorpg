@@ -5,9 +5,13 @@
 
 The following problems is mostly a step-by-step "what we need to fix" before we can start adding features. At the point where this code reconstruction is done, then features such as new characters, items, treasure chests, and doors can (and will) be added.
 
-If you want to fix a problem, go ahead and put *Claimed by * and your name and date. For example, if I wanted to claim the problem "Needs more Cowbell", it would look like this:
- # Needs more Cowbell *Claimed by brian.shourd on 12/12*
+If you want to fix a problem, go ahead and put *"-Claimed by "* and your name and date. For example, if I wanted to claim the problem "Needs more Cowbell", it would look like this:
+ # Needs more Cowbell *-Claimed by brian.shourd on 12/12*
 If you claim a problem, try to have it done (or at least pieces of it) in a timely manner. If you can't do it in a timely manner...don't claim it.
+
+Once you have fixed the problem, and updated the Repository, put *"Done "* and the date, and cross out the problem with strike through. This has a dual purpose:
+ # To help us see what has been done, and when
+ # To make us feel good about the amount of stuff that has actually been fixed
 
 
 = Details =
@@ -19,7 +23,7 @@ If you claim a problem, try to have it done (or at least pieces of it) in a time
   # ~~The Global list of Dynamic Objects should be split into a few [linked?] lists:~~ Done 12/5
   # ~~The Global lists need to be implemented as static, public members of their respective classes. This means that we will need some new classes to inherit from `Dynamic_Object`: `Background_Object` and `Interact_Object`. `Torch` should inherit from `Background_Object`.~~ Done 12/12
   # ~~The frame rate should be capped~~ Done((This still needs to be tested)) 12/12
-  # A new struct Point needs to be created, which contains x and y data values. All of the various (and numerous) points within each class and function need to be reformed to comply with this Point struct, making for cleaner, neater code. *Claimed by brian.shourd on 12/12*
+  # A new struct Point needs to be created, which contains x and y data values. All of the various (and numerous) points within each class and function need to be reformed to comply with this Point struct, making for cleaner, neater code. *-Claimed by brian.shourd on 12/12*
 
 ===Once these problems are fixed===
  # Add collision detection with the ground

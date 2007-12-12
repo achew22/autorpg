@@ -14,8 +14,10 @@ The following problems is mostly a step-by-step "what we need to fix" before we 
   # ~~Graphics needs to be put into a class. This is just proper, and can reduce the number of globals that we are using, especially since every other class already stores it's own pointers to necessary screens.~~ Done 12/5
   # ~~The Global list of Dynamic Objects should be split into a few [linked?] lists:~~ Done 12/5
   # ~~The Global lists need to be implemented as static, public members of their respective classes. This means that we will need some new classes to inherit from `Dynamic_Object`: `Background_Object` and `Interact_Object`. `Torch` should inherit from `Background_Object`.~~ Done 12/12
+  # A new struct Point needs to be created, which contains x and y data values. All of the various (and numerous) points within each class and function need to be reformed to comply with this Point struct, making for cleaner, neater code. *Claimed by brian.shourd*
 
 ===Once these problems are fixed===
+ # Add collision detection with the ground
  # Add some treasure chests for the character to open, with items inside.
  # Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.
  # Doors should be added. More to come on the implementation of this.

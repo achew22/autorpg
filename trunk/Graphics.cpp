@@ -2,12 +2,15 @@
 #include "Dynamic_Object.h"
 #include "Graphics.h"
 #include "Torch.h"
-    SDL_Surface *Graphics::screen;
-    SDL_Surface *Graphics::dynamicLayer;
-    SDL_Surface *Graphics::background;
-    SDL_Surface *Graphics::dynamicSprites;
-    SDL_Surface *Graphics::bgTiles;
-    SDL_Surface *Graphics::characters;
+#include "Interact_Object.h"
+#include "Background_Object.h"
+
+SDL_Surface *Graphics::screen;
+SDL_Surface *Graphics::dynamicLayer;
+SDL_Surface *Graphics::background;
+SDL_Surface *Graphics::dynamicSprites;
+SDL_Surface *Graphics::bgTiles;
+SDL_Surface *Graphics::characters;
 
 //Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
 //transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
@@ -86,21 +89,9 @@ void Graphics::CleanUp()
 	}
 
 	//Manually free all of the dynamic objects created with "new"
-	for (std::vector<Dynamic_Object*>::iterator i = interactObjectList.begin(); i != interactObjectList.end(); i++)
-	{
-		delete *i;
-	}
-	interactObjectList.clear();
-	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); i++)
-	{
-		delete *i;
-	}
-	backgroundObjectList.clear();
-	for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
-	{
-		delete *i;
-	}
-	Character::characterList.clear();
+	Background_Object::CleanUp();
+	Interact_Object::CleanUp();
+	Character::CleanUp();
 
 	SDL_Quit();
 }
@@ -175,7 +166,7 @@ bool Graphics::Update()
 		}
 		j++;
 	}
-	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); ++i)
+	for (std::vector<Dynamic_Object*>::iterator i = Background_Object::backgroundObjectList.begin(); i != Background_Object::backgroundObjectList.end(); ++i)
 	{
 		int x, y;
 		(*i)->GetPosition(x, y);
@@ -185,7 +176,7 @@ bool Graphics::Update()
 			(*i)->Update();
 		}
 	}
-	for (std::vector<Dynamic_Object*>::iterator i = interactObjectList.begin(); i != interactObjectList.end(); ++i)
+	for (std::vector<Dynamic_Object*>::iterator i = Interact_Object::interactObjectList.begin(); i != Interact_Object::interactObjectList.end(); ++i)
 	{
 		int x, y;
 		(*i)->GetPosition(x, y);
@@ -298,6 +289,5 @@ void Graphics::SetUpDynamicObjects()
 	for (int i=0; i<40; i++)
 	{
 		Dynamic_Object *newTorch = new Torch(100*i + 48, dynamicSprites, dynamicLayer);
-		backgroundObjectList.push_back(newTorch);
 	}
 }

@@ -16,7 +16,8 @@
 const int SCREEN_WIDTH = 200;	//Screen width
 const int SCREEN_HEIGHT = 100;	//Screen height
 const int SCREEN_BPP = 32;	//Screen BPP
-const int FPS = 30;
+const int FPS = 300;
+const double GRAVITY = -0.02;
 
 class Character;
 extern Character *hero;	//A pointer to the hero instance of the character class

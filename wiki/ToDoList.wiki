@@ -26,7 +26,7 @@ Once you have fixed the problem, and updated the Repository, put *"Done "* and t
   # A new struct Point needs to be created, which contains x and y data values. All of the various (and numerous) points within each class and function need to be reformed to comply with this Point struct, making for cleaner, neater code. *-Claimed by brian.shourd on 12/12*
 
 ===Once these problems are fixed===
- # Add collision detection with the ground
+ # ~~Add collision detection with the ground~~ -Claimed and acted (character only because nothing else currently moves verticaly) by achew22
  # Add some treasure chests for the character to open, with items inside.
  # Add some new methods to the character class. Jump(), Attack(), and Interact() (which will open boxes, use doors, etc.) are a few that I can think of.
  # Doors should be added. More to come on the implementation of this.

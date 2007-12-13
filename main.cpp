@@ -15,8 +15,8 @@ int main(int argc, char *args[])
 	graphics->SetUpDynamicObjects();
 	graphics->CreateBackground();
 	if (!graphics->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
-
-    SDL_Event SDLEvent; //The main event for polling and what-not
+	    
+	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
     int time = 0;
 	while (quit != true)
@@ -29,12 +29,15 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button pressed
-					hero->SetVelocity(1, 0);
+					hero->SetVelocity(1, hero->GetVelocityY());
 //					if (!graphics->Update()) {return 1;}
 					break;
 				case SDLK_LEFT:     //Left button pressed
-					hero->SetVelocity(-1, 0);
+					hero->SetVelocity(-1, hero->GetVelocityY());
 //					if (!graphics->Update()) {return 1;}
+					break;
+				case SDLK_UP:		//Up button pressed
+					hero->SetVelocity(hero->GetVelocityX(), 1);
 					break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
@@ -73,7 +76,7 @@ int main(int argc, char *args[])
 		if (!graphics->Update()) {return 1;}    //Update
 		if (SDL_GetTicks() - time <= 1000.0/FPS)    //Capping the frame rate: if not enough time has passed
 		{
-		    SDL_Delay(1000.0/FPS - SDL_GetTicks() + time);  //Then wait until enough time has passed
+		    SDL_Delay((Uint32)(1000.0/FPS - SDL_GetTicks() + time));  //Then wait until enough time has passed
 		}
 	}
 

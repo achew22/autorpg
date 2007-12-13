@@ -13,7 +13,9 @@ private:
 	double posx, posy;	//Position
 	double velx, vely;	//Velocity
 	double accx, accy;	//Acceleration
+	double initx, inity; //Initialized values
 	double mass;	//Mass
+	bool isJumping;
     static std::list<Character*> characterList;
 	enum
 	{

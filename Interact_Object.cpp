@@ -2,8 +2,8 @@
 
 std::vector<Dynamic_Object*> Interact_Object::interactObjectList;
 
-Interact_Object::Interact_Object(int posx, int posy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) :
-    Dynamic_Object(posx, posy, width, height, sourceSurface, destinationSurface)
+Interact_Object::Interact_Object(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) :
+    Dynamic_Object(locx, locy, width, height, sourceSurface, destinationSurface)
 {
     interactObjectList.push_back(this);
 }

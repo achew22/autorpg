@@ -1,7 +1,9 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "include.h"
+#include <SDL/SDL.h>
+#include <string>
+
 //Just a namespace of Graphics-related functions. Should eventually be turned into a class, since it is not really OOP
 //to have all these global functions and global variables
 class Graphics

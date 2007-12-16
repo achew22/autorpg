@@ -1,9 +1,10 @@
 #include "Background_Object.h"
+#include <vector>
 
 std::vector<Dynamic_Object*> Background_Object::backgroundObjectList;
 
-Background_Object::Background_Object(int posx, int posy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) :
-    Dynamic_Object(posx, posy, width, height, sourceSurface, destinationSurface)
+Background_Object::Background_Object(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) :
+    Dynamic_Object(locx, locy, width, height, sourceSurface, destinationSurface)
 {
     backgroundObjectList.push_back(this);
 }

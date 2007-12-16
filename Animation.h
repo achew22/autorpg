@@ -1,7 +1,9 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "include.h"
+#include "constants.h"
+#include <vector>
+#include <SDL/SDL.h>
 //Defines the Animation Class. An animation class is just a convenient way to store a series of
 //clips, and is really just a wrapper for a vector containing those clips. Now that I think about it,
 //why did I invent this class?

@@ -1,9 +1,13 @@
-#include "Character.h"
-#include "Dynamic_Object.h"
 #include "Graphics.h"
-#include "Torch.h"
-#include "Interact_Object.h"
 #include "Background_Object.h"
+#include "Interact_Object.h"
+#include "Character.h"
+#include <SDL/SDL_image.h>
+#include "constants.h"
+#include "Point.h"
+#include "Dynamic_Object.h"
+#include <vector>
+#include "Torch.h"
 
 SDL_Surface *Graphics::screen;
 SDL_Surface *Graphics::dynamicLayer;
@@ -129,9 +133,8 @@ bool Graphics::Update()
 	//Keep the screenLocation relative to the hero's position
 	if (hero != NULL)
 	{
-		int x, y;
-		hero->GetPosition(x, y);
-		screenLocation.x = x - 20;
+		Point pos = hero->GetPosition();
+		screenLocation.x = pos.x - 20;
 	}
 	else
 	{
@@ -155,36 +158,33 @@ bool Graphics::Update()
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
 	//yet fixed this problem
 	int j=0;
-	for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
-	{
-		int x = 0, y = 0;
-		(*i)->GetPosition(x, y);
-		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
-			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
-		{
-			(*i)->Update();
-		}
-		j++;
-	}
 	for (std::vector<Dynamic_Object*>::iterator i = Background_Object::backgroundObjectList.begin(); i != Background_Object::backgroundObjectList.end(); ++i)
 	{
-		int x, y;
-		(*i)->GetPosition(x, y);
-		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
-			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
+		Point pos = (*i)->GetPosition();
+		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
+			&& (pos.y > screenLocation.y - 50) && (pos.y < screenLocation.y + screenLocation.h + 50))
 		{
 			(*i)->Update();
 		}
 	}
 	for (std::vector<Dynamic_Object*>::iterator i = Interact_Object::interactObjectList.begin(); i != Interact_Object::interactObjectList.end(); ++i)
 	{
-		int x, y;
-		(*i)->GetPosition(x, y);
-		if ((x > screenLocation.x - 100) && (x < screenLocation.x + screenLocation.w + 100)
-			&& (y > screenLocation.y - 50) && (y < screenLocation.y + screenLocation.h + 50))
+		Point pos = (*i)->GetPosition();
+		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
+			&& (pos.y > screenLocation.y - 50) && (pos.y < screenLocation.y + screenLocation.h + 50))
 		{
 			(*i)->Update();
 		}
+	}
+    for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
+	{
+		Point pos = (*i)->GetPosition();
+		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
+			&& (pos.y > screenLocation.y - 50) && (pos.y < screenLocation.y + screenLocation.h + 50))
+		{
+			(*i)->Update();
+		}
+		j++;
 	}
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);

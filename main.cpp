@@ -1,4 +1,4 @@
-#include "include.h"
+#include "constants.h"
 #include "Graphics.h"
 #include "Character.h"
 #include "Dynamic_Object.h"
@@ -15,7 +15,7 @@ int main(int argc, char *args[])
 	graphics->SetUpDynamicObjects();
 	graphics->CreateBackground();
 	if (!graphics->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
-	    
+
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
     int time = 0;
@@ -29,15 +29,13 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button pressed
-					hero->SetVelocity(1, hero->GetVelocityY());
-//					if (!graphics->Update()) {return 1;}
+					hero->SetVelocity(1, hero->GetVelocity().y);
 					break;
 				case SDLK_LEFT:     //Left button pressed
-					hero->SetVelocity(-1, hero->GetVelocityY());
-//					if (!graphics->Update()) {return 1;}
+					hero->SetVelocity(-1, hero->GetVelocity().y);
 					break;
 				case SDLK_UP:		//Up button pressed
-					hero->SetVelocity(hero->GetVelocityX(), 1);
+					hero->Jump();
 					break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
@@ -51,14 +49,14 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button released
-					if (hero->GetVelocityX() > 0)   //If you were moving right
+					if (hero->GetVelocity().x > 0)   //If you were moving right
 					{
 						hero->SetVelocity(0, 0);    //Stop moving right
 					}
 //					if (!graphics->Update()) {return 1;}    //Update
 					break;
 				case SDLK_LEFT:     //Left button released
-					if (hero->GetVelocityX() < 0)   //If you were moving left
+					if (hero->GetVelocity().x < 0)   //If you were moving left
 					{
 						hero->SetVelocity(0, 0);    //Stop moving left
 					}

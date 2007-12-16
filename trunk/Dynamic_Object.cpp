@@ -1,12 +1,11 @@
-#include "Animation.h"
 #include "Dynamic_Object.h"
 
-Dynamic_Object::Dynamic_Object(int posx, int posy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
+Dynamic_Object::Dynamic_Object(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
 {
-	x = posx;
-	y = posy;
-	w = width;
-	h = height;
+	pos.x = locx;
+	pos.y = locy;
+	dim.x = width;
+	dim.y = height;
 	source = sourceSurface;
 	destination = destinationSurface;
 	animationLoc = 0;
@@ -22,10 +21,9 @@ void Dynamic_Object::AddAnimation(Animation anim)
 }
 
 //Get the position, in x and y
-void Dynamic_Object::GetPosition(int &posx, int &posy)
+Point Dynamic_Object::GetPosition()
 {
-	posx = x;
-	posy = y;
+	return pos;
 }
 
 //Set the flag at index to the value. Returns false if that flag doesn't exist

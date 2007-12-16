@@ -1,4 +1,6 @@
 #include "Animation.h"
+#include <vector>
+#include <SDL/SDL.h>
 
 Animation::Animation(std::vector<SDL_Rect> animation)
 {

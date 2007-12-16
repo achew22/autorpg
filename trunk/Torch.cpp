@@ -1,5 +1,3 @@
-#include "Animation.h"
-#include "Graphics.h"
 #include "Torch.h"
 
 //The constructor automatically assumes that it knows where the animations live, and sets them up for the torch.
@@ -32,5 +30,5 @@ void Torch::Update()
 	{
 		animationLoc -= 2;
 	}
-	Graphics::ApplyImage(x, y, source, destination, &animList[0][int(animationLoc)]);
+	Graphics::ApplyImage(pos.x, pos.y, source, destination, &animList[0][int(animationLoc)]);
 }

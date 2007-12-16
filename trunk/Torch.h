@@ -1,8 +1,12 @@
 #ifndef TORCH_H
 #define TORCH_H
 
-#include "include.h"
+#include "constants.h"
 #include "Background_Object.h"
+#include "Animation.h"
+#include "Graphics.h"
+#include <SDL/SDL.h>
+
 //The torch class, which inherits from dynamic object. Nothing fancy here
 class Torch : public Background_Object
 {

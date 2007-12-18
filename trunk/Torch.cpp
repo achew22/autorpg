@@ -20,15 +20,12 @@ Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
 
 	animList.push_back(Animation(newAnim));
 	newAnim.clear();
+	currentAnim = &animList[0];
 }
 
 //Update the torches animation location to the dynamicLayer
 void Torch::Update()
 {
-	animationLoc += 1/20.0;
-	if (animationLoc >= 2)
-	{
-		animationLoc -= 2;
-	}
-	Graphics::ApplyImage(pos.x, pos.y, source, destination, &animList[0][int(animationLoc)]);
+	currentAnim->Update();
+	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 }

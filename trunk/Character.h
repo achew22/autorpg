@@ -20,11 +20,15 @@ private:
     static std::list<Character*> characterList;
 	enum
 	{
-		FLAG_FACING,	//The flag indicating which way the character is facing
-		FLAG_AUTOPILOT,	//The flag indicating whether or not the AI should control this character
-		FLAG_JUMPING,   //The flag indicating whether or not the character is jumping
+		FLAG_FACING,	    //The flag indicating which way the character is facing
+		FLAG_AUTOPILOT,	    //The flag indicating whether or not the AI should control this character
+		FLAG_JUMPING,       //The flag indicating whether or not the character is jumping
 		ANIM_MOVELEFT = 0,  //The animations corresponding to moving left
-		ANIM_MOVERIGHT, //and right
+		ANIM_MOVERIGHT,     //and right
+		ANIM_JUMPLEFT,      //jumping animation, facing left
+		ANIM_JUMPRIGHT,     //jumping animation, facing right
+		ANIM_STILLLEFT,     //the standing still animation, facing left
+		ANIM_STILLRIGHT,    //standing still, facing right
 	};
 public:
 	Character(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
@@ -36,6 +40,10 @@ public:
 	void SetVelocity(double x, double y);	//Set the velocity
 	Point GetVelocity();	//Returns the velocity
 	void Jump();
+	void StopJump();
+	void MoveRight();
+	void MoveLeft();
+	void StopMove();
 	void SetAcceleration(double x, double y); //Set the acceleration
 };
 

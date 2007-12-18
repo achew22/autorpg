@@ -8,7 +8,8 @@ Dynamic_Object::Dynamic_Object(int locx, int locy, int width, int height, SDL_Su
 	dim.y = height;
 	source = sourceSurface;
 	destination = destinationSurface;
-	animationLoc = 0;
+	lastTime = SDL_GetTicks();
+	currentAnim = NULL;
 
 	animList.clear();	//Just make sure that these are all clear
 	flagList.clear();
@@ -24,6 +25,12 @@ void Dynamic_Object::AddAnimation(Animation anim)
 Point Dynamic_Object::GetPosition()
 {
 	return pos;
+}
+
+void Dynamic_Object::ChangeAnimation(Animation* animation)
+{
+    currentAnim = animation;
+    currentAnim->Begin();
 }
 
 //Set the flag at index to the value. Returns false if that flag doesn't exist

@@ -29,10 +29,10 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button pressed
-					hero->SetVelocity(1, hero->GetVelocity().y);
+					hero->MoveRight();
 					break;
 				case SDLK_LEFT:     //Left button pressed
-					hero->SetVelocity(-1, hero->GetVelocity().y);
+					hero->MoveLeft();
 					break;
 				case SDLK_UP:		//Up button pressed
 					hero->Jump();
@@ -51,16 +51,14 @@ int main(int argc, char *args[])
 				case SDLK_RIGHT:    //Right button released
 					if (hero->GetVelocity().x > 0)   //If you were moving right
 					{
-						hero->SetVelocity(0, 0);    //Stop moving right
+						hero->StopMove();    //Stop moving right
 					}
-//					if (!graphics->Update()) {return 1;}    //Update
 					break;
 				case SDLK_LEFT:     //Left button released
 					if (hero->GetVelocity().x < 0)   //If you were moving left
 					{
-						hero->SetVelocity(0, 0);    //Stop moving left
+						hero->StopMove();    //Stop moving left
 					}
-//					if (!graphics->Update()) {return 1;}    //Update
 					break;
                 default:
                     break;

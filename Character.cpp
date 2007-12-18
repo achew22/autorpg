@@ -19,6 +19,86 @@ Character::Character(int locx, int locy, int width, int height,
 	acc.y = 0;
 	mass = 100;
 
+	//Set up the animations, based on the current layout of the spritesheets. Should be within the character class
+	//since all character spritesheets should be set up in the same way (so says I!)
+    std::vector<SDL_Rect> AnimRight;    //Moving right
+	AnimRight.resize(4);
+	AnimRight[0].x = 0;
+	AnimRight[0].y = 64;
+	AnimRight[0].w = 48;
+	AnimRight[0].h = 64;
+
+	AnimRight[1].x = 48;
+	AnimRight[1].y = 64;
+	AnimRight[1].w = 48;
+	AnimRight[1].h = 64;
+
+	AnimRight[2].x = 96;
+	AnimRight[2].y = 64;
+	AnimRight[2].w = 48;
+	AnimRight[2].h = 64;
+
+	AnimRight[3] = AnimRight[1];
+
+	std::vector<SDL_Rect> AnimLeft;     //Moving left
+	AnimLeft.resize(4);
+	AnimLeft[0].x = 48;
+	AnimLeft[0].y = 192;
+	AnimLeft[0].w = 48;
+	AnimLeft[0].h = 64;
+
+	AnimLeft[1].x = 0;
+	AnimLeft[1].y = 192;
+	AnimLeft[1].w = 48;
+	AnimLeft[1].h = 64;
+
+	AnimLeft[2] = AnimLeft[0];
+
+	AnimLeft[3].x = 96;
+	AnimLeft[3].y = 192;
+	AnimLeft[3].w = 48;
+	AnimLeft[3].h = 64;
+
+    //Currently, jumping is just the same animation as standing still, but in midair
+    //Eventually, this will probably change, but at that point, the only part of the code that
+    //will need to be changed is the next few lines.
+	std::vector<SDL_Rect> AnimJumpLeft;     //Jumping, facing left
+	AnimJumpLeft.resize(1);
+	AnimJumpLeft[0].x = 48;
+	AnimJumpLeft[0].y = 192;
+	AnimJumpLeft[0].w = 48;
+	AnimJumpLeft[0].h = 64;
+
+	std::vector<SDL_Rect> AnimJumpRight;    //Jumping, facing right
+	AnimJumpRight.resize(1);
+	AnimJumpRight[0].x = 48;
+	AnimJumpRight[0].y = 64;
+	AnimJumpRight[0].w = 48;
+	AnimJumpRight[0].h = 64;
+
+	std::vector<SDL_Rect> AnimStillLeft;    //Standing, facing left
+	AnimStillLeft.resize(1);
+	AnimStillLeft[0].x = 48;
+	AnimStillLeft[0].y = 192;
+	AnimStillLeft[0].w = 48;
+	AnimStillLeft[0].h = 64;
+
+	std::vector<SDL_Rect> AnimStillRight;   //Standing, facing right
+	AnimStillRight.resize(1);
+	AnimStillRight[0].x = 48;
+	AnimStillRight[0].y = 64;
+	AnimStillRight[0].w = 48;
+	AnimStillRight[0].h = 64;
+
+	AddAnimation(AnimLeft); //Push them all back, in the order of the enums related to them
+	AddAnimation(AnimRight);
+	AddAnimation(AnimJumpLeft);
+	AddAnimation(AnimJumpRight);
+	AddAnimation(AnimStillLeft);
+	AddAnimation(AnimStillRight);
+
+    currentAnim = &animList[ANIM_STILLRIGHT];   //Always begin facing right, although this should be changed almost immediately
+        //in almost all circumstances
 	characterList.push_back(this);
 }
 
@@ -39,12 +119,11 @@ void Character::Update()
 		//pos.y = 0;
 	}
 	if (pos.y > init.y) { // its backwards of what you think -- you want greater than it means your lower
-		vel.y = 0; //Set the Y velocity to 0
+		StopJump();
 		pos.y = init.y; //Set the Y position to 0
-		flagList[FLAG_JUMPING] = 0;
 	}
 
-	//Keep the position within the level, currently 4000 pixels
+	//Keep the position within the level, currently 4000 pixels by 200 pixels
 	if (pos.x < 0)
 	{
 		pos.x = 0;
@@ -53,66 +132,136 @@ void Character::Update()
 	{
 		pos.x = 4000 - dim.x;
 	}
+    if (pos.y < 0)
+	{
+	    pos.y = 0;
+	}
+	else if (pos.y + dim.y > 200)
+	{
+	    pos.y = 200 - dim.y;
+	}
+
+    currentAnim->Update();
 
 	//Every 50 frames, move the animation one clip forward
-	animationLoc += vel.x/50.0;
-
-	//If moving right, then set the facing flag to reflect this and update the appropriate surface
-	if (vel.x > 0)
+	/*if (SDL_GetTicks() - animationTime >= currentAnim->GetClipTime())
 	{
-		flagList[FLAG_FACING] = 1;
-		if (animationLoc >= animList[ANIM_MOVERIGHT].size())	//Keep the animation location less than the size
-		{
-			animationLoc -= animList[ANIM_MOVERIGHT].size();
-		}
-		Graphics::ApplyImage(pos.x, pos.y, source, destination,
-			&animList[ANIM_MOVERIGHT][int(animationLoc)]);
+        currentAnim->nextClip();
 	}
 
-	//Same, but for left
-	else if (vel.x < 0)
+	if (animationLoc > currentAnim->size())
 	{
-		flagList[FLAG_FACING] = -1;
-		if (animationLoc < 0)
-		{
-			animationLoc += animList[ANIM_MOVELEFT].size();
-		}
-		Graphics::ApplyImage(pos.x, pos.y, source, destination,
-			&animList[ANIM_MOVELEFT][int(animationLoc)]);
+	    animationLoc -= currentAnim->size();
 	}
+	else if (animationLoc < 0)
+	{
+	    animationLoc += currentAnim->size();
+	}*/
 
-	//Similar, but now just use the standing there animations
-	else
-	{
-		if (flagList[FLAG_FACING] >= 0)	//Facing right
-		{
-			Graphics::ApplyImage(pos.x, pos.y, source, destination, &animList[ANIM_MOVERIGHT][1]);
-		}
-		else	//Facing left
-		{
-			Graphics::ApplyImage(pos.x, pos.y, source, destination, &animList[ANIM_MOVELEFT].GetFirstClip());
-		}
-	}
+	//Apply the appropriate clip pointed to by currentAnim at animationLoc
+	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 }
 
 void Character::SetVelocity(double x, double y)
 {
 	vel.x = x;
-	/*if (isJumping == false) { //If they are jumping don't let them jump. What would they jump off of? The air?
-		vel.y = y;
-	}
-	if (y > 0) {
-		isJumping = true;
-	}*/
 }
 
 void Character::Jump()
 {
     if (flagList[FLAG_JUMPING] == 0)    //If not already jumping
     {
+        if (flagList[FLAG_FACING] < 0)  //If facing left
+        {
+            ChangeAnimation(&animList[ANIM_JUMPLEFT]);  //Set the appropriate animation
+        }
+        else
+        {
+            ChangeAnimation(&animList[ANIM_JUMPRIGHT]);
+        }
         vel.y = 1;
         flagList[FLAG_JUMPING] = 1;
     }
+}
+
+void Character::StopJump()
+{
+    if (vel.x < 0)  //If moving left
+    {
+        ChangeAnimation(&animList[ANIM_MOVELEFT]);
+    }
+    else if (vel.x > 0) //If moving right
+    {
+        ChangeAnimation(&animList[ANIM_MOVERIGHT]);
+    }
+    else    //If not moving
+    {
+        if (flagList[FLAG_FACING] < 0)  //If facing left
+        {
+            ChangeAnimation(&animList[ANIM_STILLLEFT]);
+        }
+        else    //If facing right
+        {
+            ChangeAnimation(&animList[ANIM_STILLRIGHT]);
+        }
+    }
+    vel.y = 0;
+    flagList[FLAG_JUMPING] = 0;
+}
+
+void Character::MoveRight()
+{
+    if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
+    {
+        ChangeAnimation(&animList[ANIM_JUMPRIGHT]); //Set the right jumping animation
+    }
+    else
+    {
+        ChangeAnimation(&animList[ANIM_MOVERIGHT]);
+    }
+    flagList[FLAG_FACING] = 1;
+    vel.x = 1;
+}
+
+void Character::MoveLeft()
+{
+    if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
+    {
+        ChangeAnimation(&animList[ANIM_JUMPLEFT]); //Set the left jumping animation
+    }
+    else
+    {
+        ChangeAnimation(&animList[ANIM_MOVELEFT]);
+    }
+    flagList[FLAG_FACING] = -1;
+    vel.x = -1;
+}
+
+void Character::StopMove()
+{
+    if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
+    {
+        if (flagList[FLAG_FACING] < 0)  //If you are facing left
+        {
+            ChangeAnimation(&animList[ANIM_JUMPLEFT]);
+        }
+        else
+        {
+            ChangeAnimation(&animList[ANIM_JUMPRIGHT]);
+        }
+    }
+    else
+    {
+        if (flagList[FLAG_FACING] < 0)  //If you are facing left
+        {
+            ChangeAnimation(&animList[ANIM_STILLLEFT]);
+        }
+        else
+        {
+            ChangeAnimation(&animList[ANIM_STILLRIGHT]);
+        }
+    }
+    vel.x = 0;
 }
 
 Point Character::GetVelocity()

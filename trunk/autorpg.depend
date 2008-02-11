@@ -1,0 +1,94 @@
+# depslib dependency file v1.0
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Animation.cpp
+	"Animation.h"
+	<vector>
+	<SDL/SDL.h>
+	<math.h>
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Animation.h
+	"constants.h"
+	<vector>
+	<SDL/SDL.h>
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/constants.h
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Background_Object.cpp
+	"Background_Object.h"
+	<vector>
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Background_Object.h
+	"Dynamic_Object.h"
+	"Graphics.h"
+	"constants.h"
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Dynamic_Object.h
+	"constants.h"
+	"Animation.h"
+	<vector>
+	<SDL/SDL.h>
+	"Point.h"
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Point.h
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Graphics.h
+	<SDL/SDL.h>
+	<string>
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Character.cpp
+	"Character.h"
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Character.h
+	"Dynamic_Object.h"
+	"Animation.h"
+	<SDL/SDL.h>
+	<list>
+	"Point.h"
+	"Graphics.h"
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Dynamic_Object.cpp
+	"Dynamic_Object.h"
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Graphics.cpp
+	"Graphics.h"
+	"Background_Object.h"
+	"Interact_Object.h"
+	"Character.h"
+	<SDL/SDL_image.h>
+	<SDL/SDL.h>
+	"constants.h"
+	"Point.h"
+	"Dynamic_Object.h"
+	<vector>
+	"Torch.h"
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Interact_Object.h
+	"Dynamic_Object.h"
+	"constants.h"
+	"Graphics.h"
+	<vector>
+	<SDL/SDL.h>
+
+1202742520 /home/brian/Desktop/autorpg/trunk/autorpg/Torch.h
+	"constants.h"
+	"Background_Object.h"
+	"Animation.h"
+	"Graphics.h"
+	<SDL/SDL.h>
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Interact_Object.cpp
+	"Interact_Object.h"
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Point.cpp
+	"Point.h"
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/Torch.cpp
+	"Torch.h"
+
+1202742520 source:/home/brian/Desktop/autorpg/trunk/autorpg/main.cpp
+	"constants.h"
+	"Graphics.h"
+	"Character.h"
+	"Dynamic_Object.h"
+	"Torch.h"
+	<stdio.h>
+

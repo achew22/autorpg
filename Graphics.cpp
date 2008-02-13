@@ -126,16 +126,15 @@ void Graphics::CreateBackground()
 //Returns false if an error occurs
 bool Graphics::Update()
 {
-    int time = SDL_GetTicks();
 	SDL_Rect screenLocation;	//Defines essentially where the camera is at
 	screenLocation.h = 100;
 	screenLocation.w = 200;
 	screenLocation.y = 0;
 
-	//Keep the screenLocation relative to the hero's position
-	if (hero != NULL)
+	//Keep the screenLocation relative to the player1's position
+	if (player1 != NULL)
 	{
-		Point pos = hero->GetPosition();
+		Point pos = player1->GetPosition();
 		screenLocation.x = pos.x - 20;
 	}
 	else
@@ -191,10 +190,6 @@ bool Graphics::Update()
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
 
-    if (SDL_GetTicks() - time < 1000.0/FPS)
-    {
-        SDL_Delay(SDL_GetTicks() - time);
-    }
 	//Flip the buffers and return false if this fails
 	if (SDL_Flip(screen) == -1) {return false;}
 	return true;
@@ -202,7 +197,8 @@ bool Graphics::Update()
 
 void Graphics::SetUpDynamicObjects()
 {
-	hero = new Character(20, 32, 48, 64, characters, dynamicLayer);
+	player1 = new Character(20, 32, 48, 64, characters, dynamicLayer);
+	player2 = new Character(50, 32, 48, 64, characters, dynamicLayer);
 
 	for (int i=0; i<10; i++)
 	{

@@ -134,9 +134,9 @@ void Character::Update()
 	{
 		pos.x = 4000 - dim.x;
 	}
-    if (pos.y < 0)
+    if (pos.y < -30)
 	{
-	    pos.y = 0;
+	    pos.y = -30;
 	}
 	else if (pos.y + dim.y > 200)
 	{

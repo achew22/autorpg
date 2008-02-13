@@ -13,8 +13,8 @@ class Character : public Dynamic_Object
 {
 friend bool Graphics::Update();
 private:
-	Point vel;	//Velocity
-	Point acc;	//Acceleration
+	Point vel;	//Velocity in pixels per second
+	Point acc;	//Acceleration in pixels per second per second
 	Point init; //Initialized values
 	double mass;	//Mass
     static std::list<Character*> characterList;

@@ -126,6 +126,7 @@ void Graphics::CreateBackground()
 //Returns false if an error occurs
 bool Graphics::Update()
 {
+    int time = SDL_GetTicks();
 	SDL_Rect screenLocation;	//Defines essentially where the camera is at
 	screenLocation.h = 100;
 	screenLocation.w = 200;
@@ -190,6 +191,10 @@ bool Graphics::Update()
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
 
+    if (SDL_GetTicks() - time < 1000.0/FPS)
+    {
+        SDL_Delay(SDL_GetTicks() - time);
+    }
 	//Flip the buffers and return false if this fails
 	if (SDL_Flip(screen) == -1) {return false;}
 	return true;

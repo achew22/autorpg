@@ -109,13 +109,15 @@ void Character::AddAnimation(Animation animation)
 
 void Character::Update()
 {
-	pos.x += vel.x/5;
+    double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
+    printf("Seconds passed: %f\n", secsPassed);
+	pos.x += vel.x * secsPassed;
 
 	//Position vertically
 	if ((vel.y != 0)) {
 		//Gravity defined
-		pos.y = pos.y - vel.y;
-		vel.y = vel.y + (GRAVITY);
+		pos.y += vel.y * secsPassed;
+		vel.y += (GRAVITY) * secsPassed;
 		//pos.y = 0;
 	}
 	if (pos.y > init.y) { // its backwards of what you think -- you want greater than it means your lower
@@ -141,25 +143,12 @@ void Character::Update()
 	    pos.y = 200 - dim.y;
 	}
 
-    currentAnim->Update();
+    currentAnim->Update();  //The animation will determine what the appropriate current clip is, based
+        //on the current time
 
-	//Every 50 frames, move the animation one clip forward
-	/*if (SDL_GetTicks() - animationTime >= currentAnim->GetClipTime())
-	{
-        currentAnim->nextClip();
-	}
-
-	if (animationLoc > currentAnim->size())
-	{
-	    animationLoc -= currentAnim->size();
-	}
-	else if (animationLoc < 0)
-	{
-	    animationLoc += currentAnim->size();
-	}*/
-
-	//Apply the appropriate clip pointed to by currentAnim at animationLoc
+    //Apply the image appropriately
 	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
+	lastTime = SDL_GetTicks();  //Update the lastTime function
 }
 
 void Character::SetVelocity(double x, double y)
@@ -179,7 +168,7 @@ void Character::Jump()
         {
             ChangeAnimation(&animList[ANIM_JUMPRIGHT]);
         }
-        vel.y = 1;
+        vel.y = -400;
         flagList[FLAG_JUMPING] = 1;
     }
 }
@@ -220,7 +209,7 @@ void Character::MoveRight()
         ChangeAnimation(&animList[ANIM_MOVERIGHT]);
     }
     flagList[FLAG_FACING] = 1;
-    vel.x = 1;
+    vel.x = 80;    //800 pixels per second, give or take
 }
 
 void Character::MoveLeft()
@@ -234,7 +223,7 @@ void Character::MoveLeft()
         ChangeAnimation(&animList[ANIM_MOVELEFT]);
     }
     flagList[FLAG_FACING] = -1;
-    vel.x = -1;
+    vel.x = -80;   //800 pixels per second, give or take
 }
 
 void Character::StopMove()

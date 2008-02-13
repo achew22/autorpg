@@ -5,7 +5,8 @@
 #include "Torch.h"
 #include <stdio.h>
 
-Character *hero = NULL;	//A pointer to the hero instance of the character class
+Character *player1 = NULL;	//A pointer to the player1 instance of the character class
+Character *player2 = NULL;    //
 
 int main(int argc, char *args[])
 {
@@ -29,14 +30,23 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button pressed
-					hero->MoveRight();
+					player1->MoveRight();
 					break;
 				case SDLK_LEFT:     //Left button pressed
-					hero->MoveLeft();
+					player1->MoveLeft();
 					break;
 				case SDLK_UP:		//Up button pressed
-					hero->Jump();
+					player1->Jump();
 					break;
+                case SDLK_d:    //d button pressed
+                    player2->MoveRight();
+                    break;
+                case SDLK_a:    //a button pressed
+                    player2->MoveLeft();
+                    break;
+                case SDLK_w:    //w button pressed
+                    player2->Jump();
+                    break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
@@ -49,17 +59,29 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button released
-					if (hero->GetVelocity().x > 0)   //If you were moving right
+					if (player1->GetVelocity().x > 0)   //If you were moving right
 					{
-						hero->StopMove();    //Stop moving right
+						player1->StopMove();    //Stop moving right
 					}
 					break;
 				case SDLK_LEFT:     //Left button released
-					if (hero->GetVelocity().x < 0)   //If you were moving left
+					if (player1->GetVelocity().x < 0)   //If you were moving left
 					{
-						hero->StopMove();    //Stop moving left
+						player1->StopMove();    //Stop moving left
 					}
 					break;
+                case SDLK_d:    //d button released
+                    if (player2->GetVelocity().x > 0) //If you were moving right
+                    {
+                        player2->StopMove();   //Stop moving left
+                    }
+                    break;
+                case SDLK_a:    //a button released
+                    if (player2->GetVelocity().x < 0) //If you were moving left
+                    {
+                        player2->StopMove();  //Stop moving left
+                    }
+                    break;
                 default:
                     break;
 				}

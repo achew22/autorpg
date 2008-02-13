@@ -10,7 +10,8 @@ const int FPS = 30;
 const double GRAVITY = 2500;   //gravity is about 2500 pixels per second per second
 
 class Character;
-extern Character *hero;	//A pointer to the hero instance of the character class
+extern Character *player1;	//A pointer to the player1 instance of the character class
+extern Character *player2;    //A pointer to the second player
 
 #endif
 

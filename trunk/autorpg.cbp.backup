@@ -35,23 +35,7 @@
 		<Linker>
 			<Add option="`sdl-config --libs`" />
 		</Linker>
-		<Unit filename="Animation.cpp" />
-		<Unit filename="Animation.h" />
-		<Unit filename="Background_Object.cpp" />
-		<Unit filename="Background_Object.h" />
-		<Unit filename="Character.cpp" />
-		<Unit filename="Character.h" />
-		<Unit filename="Dynamic_Object.cpp" />
-		<Unit filename="Dynamic_Object.h" />
-		<Unit filename="Graphics.cpp" />
-		<Unit filename="Graphics.h" />
-		<Unit filename="Interact_Object.cpp" />
-		<Unit filename="Interact_Object.h" />
-		<Unit filename="Point.cpp" />
-		<Unit filename="Point.h" />
-		<Unit filename="Torch.cpp" />
-		<Unit filename="Torch.h" />
-		<Unit filename="constants.h" />
+		<Unit filename="cb.bmp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />

@@ -6,12 +6,10 @@
 #include <SDL/SDL.h>
 #include <list>
 #include "Point.h"
-#include "Graphics.h"
 
 //The class for any and all characters in the game.
 class Character : public Dynamic_Object
 {
-friend bool Graphics::Update();
 private:
 	Point vel;	//Velocity in pixels per second
 	Point acc;	//Acceleration in pixels per second per second

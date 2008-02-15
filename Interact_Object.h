@@ -3,13 +3,11 @@
 
 #include "Dynamic_Object.h"
 #include "constants.h"
-#include "Graphics.h"
 #include <vector>
 #include <SDL/SDL.h>
 
 class Interact_Object : public Dynamic_Object
 {
-friend bool Graphics::Update();
 private:
     static std::vector<Dynamic_Object*> interactObjectList;
 public:

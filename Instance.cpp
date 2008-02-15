@@ -1,4 +1,4 @@
-#include "Graphics.h"
+#include "Instance.h"
 #include "Background_Object.h"
 #include "Interact_Object.h"
 #include "Character.h"
@@ -10,16 +10,23 @@
 #include <vector>
 #include "Torch.h"
 
-SDL_Surface *Graphics::screen;
-SDL_Surface *Graphics::dynamicLayer;
-SDL_Surface *Graphics::background;
-SDL_Surface *Graphics::dynamicSprites;
-SDL_Surface *Graphics::bgTiles;
-SDL_Surface *Graphics::characters;
+SDL_Surface* Instance::screen;
+
+//The constructor, locx and locy determine where this particular Instance module will load it's stuff
+Instance::Instance(int locx, int locy)
+{
+    dynamicLayer = NULL;
+    background = NULL;
+    dynamicSprites = NULL;
+    bgTiles = NULL;
+    characters = NULL;
+    location.x = locx;
+    location.y = locy;
+}
 
 //Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
 //transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
-SDL_Surface *Graphics::LoadImage(std::string filename, int red = 0, int green = 255, int blue = 255)
+SDL_Surface *Instance::LoadImage(std::string filename, int red = 0, int green = 255, int blue = 255)
 {
 	SDL_Surface *loadedImage = NULL;
 	SDL_Surface *optimizedImage = NULL;
@@ -38,7 +45,7 @@ SDL_Surface *Graphics::LoadImage(std::string filename, int red = 0, int green = 
 }
 
 //Apply the surface from source to destination, at the position x, y and with the clip defined by clip, which defaults to the entire surface
-void Graphics::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip = NULL)
+void Instance::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip = NULL)
 {
 	SDL_Rect offset;
 	offset.x = x;
@@ -48,7 +55,7 @@ void Graphics::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destin
 }
 
 //Initialize the SDL libraries to be used, returns false if it fails
-bool Graphics::Init()
+bool Instance::Init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE/* | SDL_NOFRAME*/);
@@ -58,19 +65,19 @@ bool Graphics::Init()
 }
 
 //Loads the necessary files to be used. Returns false if there was some error, otherwise returns true
-bool Graphics::LoadFiles()
+bool Instance::LoadFiles(std::string dynamicSpritesFile, std::string bgTilesFile, std::string charactersFile)
 {
 	background = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
 	dynamicLayer = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
-	dynamicSprites = LoadImage("images/dynamicobjects2x.png", 0, 0xFF, 0xFF);
-	bgTiles = LoadImage("images/bgTiles2x.png", 0, 0, 0xFF);
-	characters = LoadImage("images/miniDungeonCharSprites2x.png", 0xFF, 0, 0);
+	dynamicSprites = LoadImage(dynamicSpritesFile.c_str(), 0, 0xFF, 0xFF);
+	bgTiles = LoadImage(bgTilesFile.c_str(), 0, 0, 0xFF);
+	characters = LoadImage(charactersFile.c_str(), 0xFF, 0, 0);
 	if ((dynamicSprites == NULL) || (bgTiles == NULL) || (characters == NULL)) {return false;}
 	return true;
 }
 
 //Frees all of the surfaces that were declared, unless they were already freed, then quits SDL
-void Graphics::CleanUp()
+void Instance::CleanUp()
 {
 	if (background != NULL)
 	{
@@ -101,13 +108,9 @@ void Graphics::CleanUp()
 	SDL_Quit();
 }
 
-//Creates the background layer randomly from the background tiles defined in images/bgTiles2x.png
-void Graphics::CreateBackground()
+//Creates the background layer randomly from the background tiles defined in bgTiles
+void Instance::CreateBackground()
 {
-	if (bgTiles == NULL)
-	{
-		bgTiles = LoadImage("images/bgTiles2x.png", 0, 0, 0xFF);
-	}
 	SDL_FillRect(background, &background->clip_rect, SDL_MapRGB(background->format, 0xFF, 0xFF, 0xFF));
 
 	SDL_Rect bgClip;
@@ -124,18 +127,18 @@ void Graphics::CreateBackground()
 
 //Updates every item in the allDynamicObjects list, if it is within 100 pixels of the screen. It then flips the buffers to display the frame.
 //Returns false if an error occurs
-bool Graphics::Update()
+bool Instance::Update()
 {
 	SDL_Rect screenLocation;	//Defines essentially where the camera is at
 	screenLocation.h = 100;
 	screenLocation.w = 200;
 	screenLocation.y = 0;
 
-	//Keep the screenLocation relative to the player1's position
-	if (player1 != NULL)
+	//Keep the screenLocation relative to the player's position
+	if (player != NULL)
 	{
-		Point pos = player1->GetPosition();
-		screenLocation.x = pos.x - 20;
+		Point pos = player->GetPosition();
+		screenLocation.x = (pos.x - 20);
 	}
 	else
 	{
@@ -159,7 +162,7 @@ bool Graphics::Update()
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
 	//yet fixed this problem
 	int j=0;
-	for (std::vector<Dynamic_Object*>::iterator i = Background_Object::backgroundObjectList.begin(); i != Background_Object::backgroundObjectList.end(); ++i)
+	for (std::vector<Dynamic_Object*>::iterator i = backgroundObjectList.begin(); i != backgroundObjectList.end(); ++i)
 	{
 		Point pos = (*i)->GetPosition();
 		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
@@ -168,7 +171,7 @@ bool Graphics::Update()
 			(*i)->Update();
 		}
 	}
-	for (std::vector<Dynamic_Object*>::iterator i = Interact_Object::interactObjectList.begin(); i != Interact_Object::interactObjectList.end(); ++i)
+	for (std::vector<Dynamic_Object*>::iterator i = interactObjectList.begin(); i != interactObjectList.end(); ++i)
 	{
 		Point pos = (*i)->GetPosition();
 		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
@@ -177,7 +180,7 @@ bool Graphics::Update()
 			(*i)->Update();
 		}
 	}
-    for (std::list<Character*>::iterator i = Character::characterList.begin(); i != Character::characterList.end(); i++)
+    for (std::list<Character*>::iterator i = characterList.begin(); i != characterList.end(); i++)
 	{
 		Point pos = (*i)->GetPosition();
 		if ((pos.x > screenLocation.x - 100) && (pos.x < screenLocation.x + screenLocation.w + 100)
@@ -188,26 +191,33 @@ bool Graphics::Update()
 		j++;
 	}
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
-	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
+	ApplyImage(location.x, location.y, dynamicLayer, screen, &screenLocation);
 
 	//Flip the buffers and return false if this fails
 	if (SDL_Flip(screen) == -1) {return false;}
 	return true;
 }
 
-void Graphics::SetUpDynamicObjects()
+void Instance::SetUpDynamicObjects()
 {
-	player1 = new Character(20, 32, 48, 64, characters, dynamicLayer);
-	player2 = new Character(50, 32, 48, 64, characters, dynamicLayer);
+	player = new Character(20, 32, 48, 64, characters, dynamicLayer);
+	characterList.push_back(player);
 
 	for (int i=0; i<10; i++)
 	{
 		Character *newEnemy = new Character(400*i, 32, 48, 64, characters, dynamicLayer);
+		characterList.push_back(newEnemy);
 		newEnemy->MoveLeft();
 	}
 
 	for (int i=0; i<40; i++)
 	{
 		Dynamic_Object *newTorch = new Torch(100*i + 48, dynamicSprites, dynamicLayer);
+		backgroundObjectList.push_back(newTorch);
 	}
+}
+
+Character* Instance::GetPlayer()
+{
+    return player;
 }

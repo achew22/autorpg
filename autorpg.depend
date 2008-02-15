@@ -1,77 +1,81 @@
 # depslib dependency file v1.0
-1197877620 source:/home/brian/autorpg/Animation.cpp
+1203022568 source:/home/brian/autorpg/Animation.cpp
 	"Animation.h"
 	<vector>
 	<SDL/SDL.h>
 	<math.h>
 
-1197877620 /home/brian/autorpg/Animation.h
+1203022568 /home/brian/autorpg/Animation.h
 	"constants.h"
 	<vector>
 	<SDL/SDL.h>
 
-1202943496 /home/brian/autorpg/constants.h
+1203034073 /home/brian/autorpg/constants.h
 
-1197669286 source:/home/brian/autorpg/Background_Object.cpp
+1203022568 source:/home/brian/autorpg/Background_Object.cpp
 	"Background_Object.h"
 	<vector>
 
-1197670156 /home/brian/autorpg/Background_Object.h
+1203033952 /home/brian/autorpg/Background_Object.h
 	"Dynamic_Object.h"
-	"Graphics.h"
+	"Instance.h"
 	"constants.h"
 
-1197875790 /home/brian/autorpg/Dynamic_Object.h
+1203022568 /home/brian/autorpg/Dynamic_Object.h
 	"constants.h"
 	"Animation.h"
 	<vector>
 	<SDL/SDL.h>
 	"Point.h"
 
-1197670890 /home/brian/autorpg/Point.h
+1203022568 /home/brian/autorpg/Point.h
 
-1197669654 /home/brian/autorpg/Graphics.h
+1203033270 /home/brian/autorpg/Graphics.h
 	<SDL/SDL.h>
 	<string>
-
-1202940991 source:/home/brian/autorpg/Character.cpp
+	"Point.h"
+	<vector>
+	<list>
 	"Character.h"
+	"Dynamic_Object.h"
 
-1197949430 /home/brian/autorpg/Character.h
+1203033940 source:/home/brian/autorpg/Character.cpp
+	"Character.h"
+	"Instance.h"
+
+1203026951 /home/brian/autorpg/Character.h
 	"Dynamic_Object.h"
 	"Animation.h"
 	<SDL/SDL.h>
 	<list>
 	"Point.h"
-	"Graphics.h"
 
-1197876378 source:/home/brian/autorpg/Dynamic_Object.cpp
+1203022568 source:/home/brian/autorpg/Dynamic_Object.cpp
 	"Dynamic_Object.h"
 
-1197669290 source:/home/brian/autorpg/Interact_Object.cpp
+1203022568 source:/home/brian/autorpg/Interact_Object.cpp
 	"Interact_Object.h"
 
-1197670158 /home/brian/autorpg/Interact_Object.h
+1203026970 /home/brian/autorpg/Interact_Object.h
 	"Dynamic_Object.h"
 	"constants.h"
-	"Graphics.h"
 	<vector>
 	<SDL/SDL.h>
 
-1197670888 source:/home/brian/autorpg/Point.cpp
+1203022568 source:/home/brian/autorpg/Point.cpp
 	"Point.h"
 
-1197877428 source:/home/brian/autorpg/Torch.cpp
+1203034226 source:/home/brian/autorpg/Torch.cpp
 	"Torch.h"
 
-1197670158 /home/brian/autorpg/Torch.h
+1203034205 /home/brian/autorpg/Torch.h
 	"constants.h"
 	"Background_Object.h"
 	"Animation.h"
-	"Graphics.h"
+	"Instance.h"
 	<SDL/SDL.h>
 
-1197870760 source:/home/brian/autorpg/main.cpp
+1203032809 source:/home/brian/autorpg/main.cpp
 	"constants.h"
 	"Graphics.h"
 	"Character.h"
@@ -79,8 +83,32 @@
 	"Torch.h"
 	<stdio.h>
 
-1202943001 source:/home/brian/autorpg/Graphics.cpp
+1203033279 source:/home/brian/autorpg/Graphics.cpp
 	"Graphics.h"
+	"Background_Object.h"
+	"Interact_Object.h"
+	"Character.h"
+	<SDL/SDL_image.h>
+	<SDL/SDL.h>
+	"constants.h"
+	"Point.h"
+	"Dynamic_Object.h"
+	<vector>
+	"Torch.h"
+
+1203024298 source:/home/brian/autorpg/Parser.cpp
+
+1203034190 /home/brian/autorpg/Instance.h
+	<SDL/SDL.h>
+	<string>
+	"Point.h"
+	<vector>
+	<list>
+	"Character.h"
+	"Dynamic_Object.h"
+
+1203034212 source:/home/brian/autorpg/Instance.cpp
+	"Instance.h"
 	"Background_Object.h"
 	"Interact_Object.h"
 	"Character.h"

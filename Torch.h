@@ -4,7 +4,7 @@
 #include "constants.h"
 #include "Background_Object.h"
 #include "Animation.h"
-#include "Graphics.h"
+#include "Instance.h"
 #include <SDL/SDL.h>
 
 //The torch class, which inherits from dynamic object. Nothing fancy here

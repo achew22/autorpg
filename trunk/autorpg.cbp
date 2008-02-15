@@ -43,10 +43,12 @@
 		<Unit filename="Character.h" />
 		<Unit filename="Dynamic_Object.cpp" />
 		<Unit filename="Dynamic_Object.h" />
-		<Unit filename="Graphics.cpp" />
-		<Unit filename="Graphics.h" />
+		<Unit filename="Instance.cpp" />
+		<Unit filename="Instance.h" />
 		<Unit filename="Interact_Object.cpp" />
 		<Unit filename="Interact_Object.h" />
+		<Unit filename="Parser.cpp" />
+		<Unit filename="Parser.h" />
 		<Unit filename="Point.cpp" />
 		<Unit filename="Point.h" />
 		<Unit filename="Torch.cpp" />

@@ -1,21 +1,24 @@
 #include "constants.h"
-#include "Graphics.h"
+#include "Instance.h"
 #include "Character.h"
 #include "Dynamic_Object.h"
 #include "Torch.h"
 #include <stdio.h>
 
-Character *player1 = NULL;	//A pointer to the player1 instance of the character class
-Character *player2 = NULL;    //
-
 int main(int argc, char *args[])
 {
-    Graphics *graphics = new Graphics();
-	if (!graphics->Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
-	if (!graphics->LoadFiles()) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
-	graphics->SetUpDynamicObjects();
-	graphics->CreateBackground();
-	if (!graphics->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
+    Instance *instance2 = new Instance(0, 100);
+    Instance *instance1 = new Instance(0, 0);
+	if (!Instance::Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
+	if (!instance1->LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+	instance1->SetUpDynamicObjects();
+	instance1->CreateBackground();
+	if (!instance1->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
+
+	if (!instance2->LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+	instance2->SetUpDynamicObjects();
+	instance2->CreateBackground();
+	if (!instance2->Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -30,22 +33,22 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button pressed
-					player1->MoveRight();
+					instance1->GetPlayer()->MoveRight();
 					break;
 				case SDLK_LEFT:     //Left button pressed
-					player1->MoveLeft();
+					instance1->GetPlayer()->MoveLeft();
 					break;
 				case SDLK_UP:		//Up button pressed
-					player1->Jump();
+					instance1->GetPlayer()->Jump();
 					break;
                 case SDLK_d:    //d button pressed
-                    player2->MoveRight();
+                    instance2->GetPlayer()->MoveRight();
                     break;
                 case SDLK_a:    //a button pressed
-                    player2->MoveLeft();
+                    instance2->GetPlayer()->MoveLeft();
                     break;
                 case SDLK_w:    //w button pressed
-                    player2->Jump();
+                    instance2->GetPlayer()->Jump();
                     break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
@@ -59,27 +62,27 @@ int main(int argc, char *args[])
 				switch (SDLEvent.key.keysym.sym)
 				{
 				case SDLK_RIGHT:    //Right button released
-					if (player1->GetVelocity().x > 0)   //If you were moving right
+					if (instance1->GetPlayer()->GetVelocity().x > 0)   //If you were moving right
 					{
-						player1->StopMove();    //Stop moving right
+						instance1->GetPlayer()->StopMove();    //Stop moving right
 					}
 					break;
 				case SDLK_LEFT:     //Left button released
-					if (player1->GetVelocity().x < 0)   //If you were moving left
+					if (instance1->GetPlayer()->GetVelocity().x < 0)   //If you were moving left
 					{
-						player1->StopMove();    //Stop moving left
+						instance1->GetPlayer()->StopMove();    //Stop moving left
 					}
 					break;
                 case SDLK_d:    //d button released
-                    if (player2->GetVelocity().x > 0) //If you were moving right
+                    if (instance2->GetPlayer()->GetVelocity().x > 0) //If you were moving right
                     {
-                        player2->StopMove();   //Stop moving left
+                        instance2->GetPlayer()->StopMove();   //Stop moving left
                     }
                     break;
                 case SDLK_a:    //a button released
-                    if (player2->GetVelocity().x < 0) //If you were moving left
+                    if (instance2->GetPlayer()->GetVelocity().x < 0) //If you were moving left
                     {
-                        player2->StopMove();  //Stop moving left
+                        instance2->GetPlayer()->StopMove();  //Stop moving left
                     }
                     break;
                 default:
@@ -91,15 +94,18 @@ int main(int argc, char *args[])
 				quit = true;    //If the person "X"'s out of the window
 			}
 		}
-		if (!graphics->Update()) {return 1;}    //Update
+		if (!instance1->Update()) {return 1;}    //Update
+		if (!instance2->Update()) {return 1;}    //Update
 		if (SDL_GetTicks() - time <= 1000.0/FPS)    //Capping the frame rate: if not enough time has passed
 		{
 		    SDL_Delay((Uint32)(1000.0/FPS - SDL_GetTicks() + time));  //Then wait until enough time has passed
 		}
 	}
 
-	graphics->CleanUp();    //Clean up all dynamically allocated memory
-	delete graphics;
+	instance1->CleanUp();    //Clean up all dynamically allocated memory
+	instance2->CleanUp();
+	delete instance1;
+	delete instance2;
 
 	return 0;
 }

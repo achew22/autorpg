@@ -2,42 +2,60 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="Animation.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="0" topLine="54" />
+		<Cursor position="1420" topLine="42" />
+	</File>
+	<File name="Animation.h" open="1" top="0" tabpos="13">
+		<Cursor position="371" topLine="1" />
 	</File>
 	<File name="Background_Object.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="Background_Object.h" open="1" top="0" tabpos="10">
-		<Cursor position="134" topLine="0" />
+	<File name="Background_Object.h" open="1" top="0" tabpos="9">
+		<Cursor position="89" topLine="0" />
 	</File>
 	<File name="Character.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="6736" topLine="246" />
+		<Cursor position="4143" topLine="134" />
 	</File>
-	<File name="Character.h" open="1" top="0" tabpos="6">
-		<Cursor position="1686" topLine="31" />
+	<File name="Character.h" open="1" top="0" tabpos="5">
+		<Cursor position="154" topLine="9" />
 	</File>
-	<File name="Dynamic_Object.h" open="1" top="0" tabpos="7">
-		<Cursor position="0" topLine="15" />
+	<File name="Dynamic_Object.h" open="1" top="0" tabpos="6">
+		<Cursor position="0" topLine="2" />
 	</File>
-	<File name="Graphics.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="6520" topLine="180" />
+	<File name="Instance.cpp" open="1" top="1" tabpos="16">
+		<Cursor position="302" topLine="0" />
 	</File>
-	<File name="Interact_Object.cpp" open="1" top="0" tabpos="13">
+	<File name="Instance.h" open="1" top="0" tabpos="17">
+		<Cursor position="2564" topLine="18" />
+	</File>
+	<File name="Interact_Object.cpp" open="1" top="0" tabpos="12">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="Interact_Object.h" open="1" top="0" tabpos="9">
-		<Cursor position="327" topLine="2" />
+	<File name="Interact_Object.h" open="1" top="0" tabpos="8">
+		<Cursor position="107" topLine="0" />
 	</File>
-	<File name="Point.cpp" open="1" top="0" tabpos="11">
+	<File name="Parser.cpp" open="1" top="0" tabpos="15">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="Parser.h" open="1" top="0" tabpos="14">
+		<Cursor position="159" topLine="0" />
+	</File>
+	<File name="Point.cpp" open="1" top="0" tabpos="10">
 		<Cursor position="117" topLine="0" />
 	</File>
-	<File name="Point.h" open="1" top="0" tabpos="12">
+	<File name="Point.h" open="1" top="0" tabpos="11">
 		<Cursor position="328" topLine="0" />
 	</File>
-	<File name="constants.h" open="1" top="0" tabpos="8">
-		<Cursor position="576" topLine="0" />
+	<File name="Torch.cpp" open="1" top="0" tabpos="19">
+		<Cursor position="797" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="2282" topLine="0" />
+	<File name="Torch.h" open="1" top="0" tabpos="18">
+		<Cursor position="134" topLine="0" />
+	</File>
+	<File name="constants.h" open="1" top="0" tabpos="7">
+		<Cursor position="50" topLine="0" />
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="323" topLine="73" />
 	</File>
 </CodeBlocks_layout_file>

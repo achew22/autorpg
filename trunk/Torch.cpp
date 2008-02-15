@@ -27,5 +27,5 @@ Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
 void Torch::Update()
 {
 	currentAnim->Update();
-	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
+	Instance::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 }

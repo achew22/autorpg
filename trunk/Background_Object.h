@@ -2,12 +2,11 @@
 #define BACKGROUND_OBJECT_H
 
 #include "Dynamic_Object.h"
-#include "Graphics.h"
+#include "Instance.h"
 #include "constants.h"
 
 class Background_Object : public Dynamic_Object
 {
-friend bool Graphics::Update();
 private:
     static std::vector<Dynamic_Object*> backgroundObjectList;
 public:

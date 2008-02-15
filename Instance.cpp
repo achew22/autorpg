@@ -9,59 +9,19 @@
 #include "Dynamic_Object.h"
 #include <vector>
 #include "Torch.h"
-
-SDL_Surface* Instance::screen;
+#include "Graphics.h"
 
 //The constructor, locx and locy determine where this particular Instance module will load it's stuff
-Instance::Instance(int locx, int locy)
+Instance::Instance(int locx, int locy, SDL_Surface* theScreen)
 {
     dynamicLayer = NULL;
     background = NULL;
     dynamicSprites = NULL;
     bgTiles = NULL;
+    screen = theScreen;
     characters = NULL;
     location.x = locx;
     location.y = locy;
-}
-
-//Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
-//transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
-SDL_Surface *Instance::LoadImage(std::string filename, int red = 0, int green = 255, int blue = 255)
-{
-	SDL_Surface *loadedImage = NULL;
-	SDL_Surface *optimizedImage = NULL;
-	loadedImage = IMG_Load(filename.c_str());
-	if (loadedImage != NULL)
-	{
-		optimizedImage = SDL_DisplayFormat(loadedImage);
-		SDL_FreeSurface(loadedImage);
-		if (optimizedImage != NULL)
-		{
-			Uint32 colorKey = SDL_MapRGB(optimizedImage->format, red, green, blue);
-			SDL_SetColorKey(optimizedImage, SDL_SRCCOLORKEY, colorKey);
-		}
-	}
-	return optimizedImage;
-}
-
-//Apply the surface from source to destination, at the position x, y and with the clip defined by clip, which defaults to the entire surface
-void Instance::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip = NULL)
-{
-	SDL_Rect offset;
-	offset.x = x;
-	offset.y = y;
-
-	SDL_BlitSurface(source, clip, destination, &offset);
-}
-
-//Initialize the SDL libraries to be used, returns false if it fails
-bool Instance::Init()
-{
-	if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
-	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE/* | SDL_NOFRAME*/);
-	if (screen == NULL) {return false;}
-	SDL_WM_SetCaption("AutoRPG - Development", NULL);
-	return true;
 }
 
 //Loads the necessary files to be used. Returns false if there was some error, otherwise returns true
@@ -69,9 +29,9 @@ bool Instance::LoadFiles(std::string dynamicSpritesFile, std::string bgTilesFile
 {
 	background = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
 	dynamicLayer = SDL_CreateRGBSurface(SDL_SWSURFACE, 4000, 100, SCREEN_BPP, NULL, NULL, NULL, NULL);
-	dynamicSprites = LoadImage(dynamicSpritesFile.c_str(), 0, 0xFF, 0xFF);
-	bgTiles = LoadImage(bgTilesFile.c_str(), 0, 0, 0xFF);
-	characters = LoadImage(charactersFile.c_str(), 0xFF, 0, 0);
+	dynamicSprites = Graphics::LoadImage(dynamicSpritesFile.c_str(), 0, 0xFF, 0xFF);
+	bgTiles = Graphics::LoadImage(bgTilesFile.c_str(), 0, 0, 0xFF);
+	characters = Graphics::LoadImage(charactersFile.c_str(), 0xFF, 0, 0);
 	if ((dynamicSprites == NULL) || (bgTiles == NULL) || (characters == NULL)) {return false;}
 	return true;
 }
@@ -104,8 +64,6 @@ void Instance::CleanUp()
 	Background_Object::CleanUp();
 	Interact_Object::CleanUp();
 	Character::CleanUp();
-
-	SDL_Quit();
 }
 
 //Creates the background layer randomly from the background tiles defined in bgTiles
@@ -120,7 +78,7 @@ void Instance::CreateBackground()
 	{
 		bgClip.x = rand()%4 * 200;
 		bgClip.y = rand()%3 * 100;
-		ApplyImage(200*i, 0, bgTiles, background, &bgClip);
+		Graphics::ApplyImage(200*i, 0, bgTiles, background, &bgClip);
 	}
 	SDL_FreeSurface(bgTiles);
 }
@@ -156,7 +114,7 @@ bool Instance::Update()
 	}
 
 	//Apply the background to the dynamicLayer
-	ApplyImage(0, 0, background, dynamicLayer);
+	Graphics::ApplyImage(0, 0, background, dynamicLayer);
 
 	//Check every dynamicObject in our main lists to see if it is close enough to the screen to warrant an update
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
@@ -191,10 +149,8 @@ bool Instance::Update()
 		j++;
 	}
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
-	ApplyImage(location.x, location.y, dynamicLayer, screen, &screenLocation);
+	Graphics::ApplyImage(location.x, location.y, dynamicLayer, screen, &screenLocation);
 
-	//Flip the buffers and return false if this fails
-	if (SDL_Flip(screen) == -1) {return false;}
 	return true;
 }
 

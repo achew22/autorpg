@@ -1,4 +1,5 @@
 #include "Torch.h"
+#include "Graphics.h"
 
 //The constructor automatically assumes that it knows where the animations live, and sets them up for the torch.
 Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface) : Background_Object(x, 26, 50, 50, sourceSurface, destinationSurface)
@@ -27,5 +28,5 @@ Torch::Torch(int x, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface)
 void Torch::Update()
 {
 	currentAnim->Update();
-	Instance::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
+	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 }

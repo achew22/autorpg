@@ -1,5 +1,6 @@
 #include "Character.h"
 #include "Instance.h"
+#include "Graphics.h"
 
 std::list<Character*> Character::characterList;
 
@@ -148,7 +149,7 @@ void Character::Update()
         //on the current time
 
     //Apply the image appropriately
-	Instance::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
+	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 	lastTime = SDL_GetTicks();  //Update the lastTime function
 }
 

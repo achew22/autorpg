@@ -2,6 +2,7 @@
 #include "Background_Object.h"
 #include "Interact_Object.h"
 #include "Character.h"
+#include "Sprite_Sheet.h"
 #include <SDL/SDL_image.h>
 #include <SDL/SDL.h>
 #include "constants.h"

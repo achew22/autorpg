@@ -1,3 +1,6 @@
+#ifndef SPRITE_SHEET_H
+#define SPRITE_SHEET_H
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <vector>
@@ -13,3 +16,5 @@ public:
     Sprite_Sheet(int wOfSprite, int hOfSprite, int wOfSheet, int hOfSheet, SDL_Surface* sheet);
     void ApplySprite(int x, int y, int spriteNum, SDL_Surface* destination);
 };
+
+#endif

@@ -4,8 +4,9 @@
 #include <SDL/SDL.h>
 #include <string>
 #include "Point.h"
+#include "Sprite_Sheet.h"
 #include <vector>
-#include <list>
+#include <map>
 #include "Character.h"
 #include "Dynamic_Object.h"
 
@@ -27,10 +28,12 @@ private:
     SDL_Surface *characters;
         //The surface containing all of the sprites necessary to create the characters
     Point location; //The location at which this particular veiw will be
-    std::list<Character*> characterList;    //Pointers to the lists that will need to be updated that exist in this instace of graphics
+    std::map<std::string, Character*> characterList;    //Pointers to the lists that will need to be updated that exist in this instace of graphics
     std::vector<Dynamic_Object*> backgroundObjectList;
     std::vector<Dynamic_Object*> interactObjectList;
     Character* player;
+
+    Sprite_Sheet* tempSpriteSheet;
 public:
     Instance(int locx, int locy, SDL_Surface* theScreen);
 	bool LoadFiles(std::string dynamicSpritesFile, std::string bgTilesFile, std::string charactersFile);	//Load all of the necessary files for this game

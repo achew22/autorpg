@@ -186,18 +186,6 @@ void Character::UpdatePosition()
 	pos.x += vel.x * secsPassed;
 	pos.y += vel.y * secsPassed;
 
-	//Position vertically
-/*	if ((vel.y != 0)) {
-		//Gravity defined
-		pos.y += vel.y * secsPassed;
-		vel.y += (GRAVITY) * secsPassed;
-		//pos.y = 0;
-	}
-	if (pos.y > init.y) { // its backwards of what you think -- you want greater than it means your lower
-		StopJump();
-		pos.y = init.y; //Set the Y position to 0
-	}*/
-
 	//Keep the position within the level, currently 4000 pixels by 400 pixels
 	if (pos.x < 0)
 	{
@@ -227,12 +215,6 @@ void Character::UpdateAnimation()
     //Apply the image appropriately
 	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 	lastTime = SDL_GetTicks();  //Update the lastTime function
-}
-
-void Character::SetVelocity(double x, double y)
-{
-	vel.x = x;
-	vel.y = y;
 }
 
 void Character::Jump()
@@ -345,48 +327,45 @@ void Character::MoveDown()
     vel.y = 80;
 }
 
-void Character::StopMove()
+void Character::StopMoveHoriz()
 {
-    if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
+    if (vel.y < 0)  //If moving up
     {
-        switch (flagList[FLAG_FACING])
-        {
-        case 1: //facing left
-            ChangeAnimation(&animList[ANIM_JUMPLEFT]);
-            break;
-        case 2: //facing right
-            ChangeAnimation(&animList[ANIM_JUMPRIGHT]);
-            break;
-        case 3: //facing up
-            ChangeAnimation(&animList[ANIM_JUMPUP]);
-            break;
-        case 4: //facing down
-            ChangeAnimation(&animList[ANIM_JUMPDOWN]);
-            break;
-        default:    //Should not happen - indicates an error
-            break;
-        }
+        ChangeAnimation(&animList[ANIM_MOVEUP]);
     }
-    else
+    else if (vel.y > 0)   //If moving down
     {
-        if (flagList[FLAG_FACING] == 1)  //If facing left
-        {
-            ChangeAnimation(&animList[ANIM_STILLLEFT]);
-        }
-        else if (flagList[FLAG_FACING] == 2)   //If facing right
-        {
-            ChangeAnimation(&animList[ANIM_STILLRIGHT]);
-        }
-        else if (flagList[FLAG_FACING] == 3)    //If facing up
-        {
-            ChangeAnimation(&animList[ANIM_STILLUP]);
-        }
-        else if (flagList[FLAG_FACING] == 4)    //If facing down
-        {
-            ChangeAnimation(&animList[ANIM_STILLDOWN]);
-        }
+        ChangeAnimation(&animList[ANIM_MOVEDOWN]);
+    }
+    else if (flagList[FLAG_FACING] == 1)    //If facing left
+    {
+        ChangeAnimation(&animList[ANIM_STILLLEFT]);
+    }
+    else if (flagList[FLAG_FACING] == 2)    //If facing right
+    {
+        ChangeAnimation(&animList[ANIM_STILLRIGHT]);
     }
     vel.x = 0;
+}
+
+void Character::StopMoveVert()
+{
+    if (vel.x < 0)  //If moving left
+    {
+        ChangeAnimation(&animList[ANIM_MOVELEFT]);
+    }
+    else if (vel.x > 0)   //If moving right
+    {
+        ChangeAnimation(&animList[ANIM_MOVERIGHT]);
+    }
+    else if (flagList[FLAG_FACING] == 3)    //If facing up
+    {
+        ChangeAnimation(&animList[ANIM_STILLUP]);
+    }
+    else if (flagList[FLAG_FACING] == 4)    //If facing down
+    {
+        ChangeAnimation(&animList[ANIM_STILLDOWN]);
+    }
     vel.y = 0;
 }
 

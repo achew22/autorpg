@@ -13,7 +13,8 @@ class Sprite_Sheet
 private:
     std::vector<SDL_Surface*> sprites;
 public:
-    Sprite_Sheet(int wOfSprite, int hOfSprite, int wOfSheet, int hOfSheet, SDL_Surface* sheet);
+    Sprite_Sheet(int wOfSprite, int hOfSprite, std::string filename, int red = 0, int green = 255, int blue = 255);
+    ~Sprite_Sheet();
     void ApplySprite(int x, int y, int spriteNum, SDL_Surface* destination);
 };
 

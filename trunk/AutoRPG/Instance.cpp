@@ -34,7 +34,7 @@ bool Instance::LoadFiles(std::string dynamicSpritesFile, std::string bgTilesFile
 	bgTiles = Graphics::LoadImage(bgTilesFile.c_str(), 0, 0, 0xFF);
 	characters = Graphics::LoadImage(charactersFile.c_str(), 0xFF, 0, 0);
 
-	tempSpriteSheet = new Sprite_Sheet(48, 64, 48*6, 64*4, characters);
+	tempSpriteSheet = new Sprite_Sheet(48, 64, charactersFile, 0xFF, 0, 0);
 
 	if ((dynamicSprites == NULL) || (bgTiles == NULL) || (characters == NULL)) {return false;}
 	return true;
@@ -146,7 +146,7 @@ bool Instance::Update()
 		}
 	}
 
-	tempSpriteSheet->ApplySprite(0, 0, 5, dynamicLayer); //Testing out the Sprite_Sheet Class
+	tempSpriteSheet->ApplySprite(0, 0, 3, dynamicLayer); //Testing out the Sprite_Sheet Class
 
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	Graphics::ApplyImage(location.x, location.y, dynamicLayer, screen, &screenLocation);

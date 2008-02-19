@@ -11,7 +11,7 @@ int main(int argc, char *args[])
     Graphics graphics;
    	if (!graphics.Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
 
-    Instance instance2(0, 100, graphics.GetScreen());
+//    Instance instance2(0, 100, graphics.GetScreen());
     Instance instance1(0, 0, graphics.GetScreen());
 
 	if (!instance1.LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
@@ -19,10 +19,10 @@ int main(int argc, char *args[])
 	instance1.CreateBackground();
 	if (!instance1.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
 
-	if (!instance2.LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+/*	if (!instance2.LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
 	instance2.SetUpDynamicObjects();
 	instance2.CreateBackground();
-	if (!instance2.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
+	if (!instance2.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}*/
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -43,9 +43,12 @@ int main(int argc, char *args[])
 					instance1.GetPlayer()->MoveLeft();
 					break;
 				case SDLK_UP:		//Up button pressed
-					instance1.GetPlayer()->Jump();
+					instance1.GetPlayer()->MoveUp();
 					break;
-                case SDLK_d:    //d button pressed
+                case SDLK_DOWN:     //Down button pressed
+                    instance1.GetPlayer()->MoveDown();
+                    break;
+/*                case SDLK_d:    //d button pressed
                     instance2.GetPlayer()->MoveRight();
                     break;
                 case SDLK_a:    //a button pressed
@@ -53,7 +56,7 @@ int main(int argc, char *args[])
                     break;
                 case SDLK_w:    //w button pressed
                     instance2.GetPlayer()->Jump();
-                    break;
+                    break;*/
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
@@ -77,7 +80,19 @@ int main(int argc, char *args[])
 						instance1.GetPlayer()->StopMove();    //Stop moving left
 					}
 					break;
-                case SDLK_d:    //d button released
+                case SDLK_UP:     //Up button released
+					if (instance1.GetPlayer()->GetVelocity().y < 0)   //If you were moving up
+					{
+						instance1.GetPlayer()->StopMove();    //Stop moving up
+					}
+					break;
+                case SDLK_DOWN: //Down button released
+                    if (instance1.GetPlayer()->GetVelocity().y > 0) //If you were moving down
+                    {
+                        instance1.GetPlayer()->StopMove();  //Stop moving down
+                    }
+                    break;
+/*                case SDLK_d:    //d button released
                     if (instance2.GetPlayer()->GetVelocity().x > 0) //If you were moving right
                     {
                         instance2.GetPlayer()->StopMove();   //Stop moving left
@@ -88,7 +103,7 @@ int main(int argc, char *args[])
                     {
                         instance2.GetPlayer()->StopMove();  //Stop moving left
                     }
-                    break;
+                    break;*/
                 default:
                     break;
 				}
@@ -99,12 +114,12 @@ int main(int argc, char *args[])
 			}
 		}
 		if (!instance1.Update()) {return 1;}    //Update
-		if (!instance2.Update()) {return 1;}    //Update
+//		if (!instance2.Update()) {return 1;}    //Update
 		if (!graphics.Update()) {return 1;}     //Update
 	}
 
 	instance1.CleanUp();    //Clean up all dynamically allocated memory
-	instance2.CleanUp();
+//	instance2.CleanUp();
 	graphics.CleanUp();
 
 	return 0;

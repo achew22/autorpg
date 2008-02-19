@@ -23,6 +23,8 @@ protected:
     Animation* currentAnim; //A pointer to the current animation being used
 public:
 	Dynamic_Object(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface);
+	virtual void UpdateAnimation() {};  //The pure virtual function to update the animation
+	virtual void UpdatePosition() {};   //The pure virtual function for updating positions
 	virtual void Update() {};	//The pure virtual function to update all relevant information about the object
 	virtual void AddAnimation(Animation anim);	//Add an animation to the list
 	virtual Point GetPosition();	//Get the current position

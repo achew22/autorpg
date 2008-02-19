@@ -182,7 +182,7 @@ void Character::AddAnimation(Animation animation)
 void Character::UpdatePosition()
 {
     double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
-    printf("Seconds passed: %f\n", secsPassed);
+//    printf("Seconds passed: %f\n", secsPassed);
 	pos.x += vel.x * secsPassed;
 	pos.y += vel.y * secsPassed;
 
@@ -332,10 +332,12 @@ void Character::StopMoveHoriz()
     if (vel.y < 0)  //If moving up
     {
         ChangeAnimation(&animList[ANIM_MOVEUP]);
+	flagList[FLAG_FACING] = 3;
     }
     else if (vel.y > 0)   //If moving down
     {
         ChangeAnimation(&animList[ANIM_MOVEDOWN]);
+	flagList[FLAG_FACING] = 4;
     }
     else if (flagList[FLAG_FACING] == 1)    //If facing left
     {
@@ -353,10 +355,12 @@ void Character::StopMoveVert()
     if (vel.x < 0)  //If moving left
     {
         ChangeAnimation(&animList[ANIM_MOVELEFT]);
+	flagList[FLAG_FACING] = 1;
     }
     else if (vel.x > 0)   //If moving right
     {
         ChangeAnimation(&animList[ANIM_MOVERIGHT]);
+	flagList[FLAG_FACING] = 2;
     }
     else if (flagList[FLAG_FACING] == 3)    //If facing up
     {

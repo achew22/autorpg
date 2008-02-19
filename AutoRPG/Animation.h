@@ -4,9 +4,8 @@
 #include "constants.h"
 #include <vector>
 #include <SDL/SDL.h>
-//Defines the Animation Class. An animation class is just a convenient way to store a series of
-//clips, and is really just a wrapper for a vector containing those clips. Now that I think about it,
-//why did I invent this class?
+//Defines the Animation Class. An animation class is just a convenient way to store and manage
+//a series of clips.
 class Animation
 {
 private:
@@ -16,6 +15,8 @@ private:
 	int clipLength;     //The length of time that each clip in this animation is (ms)
 	int animationLoc;   //the index value of the current clip this animation is on
 	int numClips;   //The number of clips in the animation
+
+
 public:
 	Animation(std::vector<SDL_Rect> animation, int clipTime = 120);
 	~Animation();

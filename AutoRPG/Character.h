@@ -45,7 +45,6 @@ public:
 	virtual void UpdateAnimation();	//Updates the surface on which the character should be updated
     //virtual Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
-	void SetVelocity(double x, double y);	//Set the velocity
 	Point GetVelocity();	//Returns the velocity
 	void Jump();
 	void StopJump();
@@ -53,8 +52,8 @@ public:
 	void MoveLeft();
 	void MoveUp();
 	void MoveDown();
-	void StopMove();
-	void SetAcceleration(double x, double y); //Set the acceleration
+	void StopMoveHoriz();
+	void StopMoveVert();
 };
 
 #endif

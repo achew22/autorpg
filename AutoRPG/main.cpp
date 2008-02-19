@@ -71,25 +71,25 @@ int main(int argc, char *args[])
 				case SDLK_RIGHT:    //Right button released
 					if (instance1.GetPlayer()->GetVelocity().x > 0)   //If you were moving right
 					{
-						instance1.GetPlayer()->StopMove();    //Stop moving right
+						instance1.GetPlayer()->StopMoveHoriz();    //Stop moving right
 					}
 					break;
 				case SDLK_LEFT:     //Left button released
 					if (instance1.GetPlayer()->GetVelocity().x < 0)   //If you were moving left
 					{
-						instance1.GetPlayer()->StopMove();    //Stop moving left
+						instance1.GetPlayer()->StopMoveHoriz();    //Stop moving left
 					}
 					break;
                 case SDLK_UP:     //Up button released
 					if (instance1.GetPlayer()->GetVelocity().y < 0)   //If you were moving up
 					{
-						instance1.GetPlayer()->StopMove();    //Stop moving up
+						instance1.GetPlayer()->StopMoveVert();    //Stop moving up
 					}
 					break;
                 case SDLK_DOWN: //Down button released
                     if (instance1.GetPlayer()->GetVelocity().y > 0) //If you were moving down
                     {
-                        instance1.GetPlayer()->StopMove();  //Stop moving down
+                        instance1.GetPlayer()->StopMoveVert();  //Stop moving down
                     }
                     break;
 /*                case SDLK_d:    //d button released

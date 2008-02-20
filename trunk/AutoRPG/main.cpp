@@ -2,7 +2,6 @@
 #include "Instance.h"
 #include "Character.h"
 #include "Dynamic_Object.h"
-#include "Torch.h"
 #include "Graphics.h"
 #include <stdio.h>
 
@@ -48,15 +47,6 @@ int main(int argc, char *args[])
                 case SDLK_DOWN:     //Down button pressed
                     instance1.GetPlayer()->MoveDown();
                     break;
-/*                case SDLK_d:    //d button pressed
-                    instance2.GetPlayer()->MoveRight();
-                    break;
-                case SDLK_a:    //a button pressed
-                    instance2.GetPlayer()->MoveLeft();
-                    break;
-                case SDLK_w:    //w button pressed
-                    instance2.GetPlayer()->Jump();
-                    break;*/
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
@@ -92,18 +82,6 @@ int main(int argc, char *args[])
                         instance1.GetPlayer()->StopMoveVert();  //Stop moving down
                     }
                     break;
-/*                case SDLK_d:    //d button released
-                    if (instance2.GetPlayer()->GetVelocity().x > 0) //If you were moving right
-                    {
-                        instance2.GetPlayer()->StopMove();   //Stop moving left
-                    }
-                    break;
-                case SDLK_a:    //a button released
-                    if (instance2.GetPlayer()->GetVelocity().x < 0) //If you were moving left
-                    {
-                        instance2.GetPlayer()->StopMove();  //Stop moving left
-                    }
-                    break;*/
                 default:
                     break;
 				}

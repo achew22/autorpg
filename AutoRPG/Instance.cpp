@@ -9,7 +9,6 @@
 #include "Point.h"
 #include "Dynamic_Object.h"
 #include <vector>
-#include "Torch.h"
 #include "Graphics.h"
 
 //The constructor, locx and locy determine where this particular Instance module will load it's stuff
@@ -33,8 +32,6 @@ bool Instance::LoadFiles(std::string dynamicSpritesFile, std::string bgTilesFile
 	dynamicSprites = Graphics::LoadImage(dynamicSpritesFile.c_str(), 0, 0xFF, 0xFF);
 	bgTiles = Graphics::LoadImage(bgTilesFile.c_str(), 0, 0, 0xFF);
 	characters = Graphics::LoadImage(charactersFile.c_str(), 0xFF, 0, 0);
-
-	tempSpriteSheet = new Sprite_Sheet(48, 64, charactersFile, 0xFF, 0, 0);
 
 	if ((dynamicSprites == NULL) || (bgTiles == NULL) || (characters == NULL)) {return false;}
 	return true;
@@ -146,8 +143,6 @@ bool Instance::Update()
 		}
 	}
 
-	tempSpriteSheet->ApplySprite(0, 0, 3, dynamicLayer); //Testing out the Sprite_Sheet Class
-
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	Graphics::ApplyImage(location.x, location.y, dynamicLayer, screen, &screenLocation);
 
@@ -158,12 +153,6 @@ void Instance::SetUpDynamicObjects()
 {
 	player = new Character(20, 32, 48, 64, characters, dynamicLayer, "player");
 	characterList.insert(characterList.begin(), std::pair<std::string, Character*>("player", player));
-
-	for (int i=0; i<40; i++)
-	{
-		Dynamic_Object *newTorch = new Torch(100*i + 48, dynamicSprites, dynamicLayer);
-		backgroundObjectList.push_back(newTorch);
-	}
 }
 
 Character* Instance::GetPlayer()

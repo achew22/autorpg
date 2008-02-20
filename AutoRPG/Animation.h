@@ -2,33 +2,31 @@
 #define ANIMATION_H
 
 #include "constants.h"
+#include "Sprite_Sheet.h"
 #include <vector>
 #include <SDL/SDL.h>
+#include <string>
 //Defines the Animation Class. An animation class is just a convenient way to store and manage
 //a series of clips.
 class Animation
 {
 private:
-	std::vector<SDL_Rect> animSeries;	//Stores the clips
-    SDL_Rect* currentClip;   //Which frame of the animation is this on?
-	int lastAnimTime;   //The time that the animation was last updated (ms)
-	int clipLength;     //The length of time that each clip in this animation is (ms)
-	int animationLoc;   //the index value of the current clip this animation is on
-	int numClips;   //The number of clips in the animation
-
-
+    Sprite_Sheet* spriteSheet;  //A pointer to the Sprite_Sheet class instance containing
+        //all of the sprites for this animation
+    std::vector<int> sprites;
+    std::vector<int>::iterator currentSprite;
+    int lastAnimTime;
+    int clipLength;
 public:
-	Animation(std::vector<SDL_Rect> animation, int clipTime = 120);
-	~Animation();
-	SDL_Rect operator [](int i);	//Simply reference a clip by its index
-	SDL_Rect GetClip(int index);    //Same as above, but in function form
-	Animation operator =(Animation anim);
-	void Begin();   //Begin this animation loop
-	void Update();  //Update this animation loop
-	int size();	//Return the number of frames in the animation
-	SDL_Rect GetCurrentClip();  //Return the current clip
-	SDL_Rect GetFinalClip();	//Return the first clip
-	SDL_Rect GetFirstClip();	//Return the final clip
+	Animation(std::string file, int spriteW, int spriteH, std::vector<int> spriteIndexes, int clipTime = 120,
+        int red = 0, int green = 255, int blue = 255);  //Pass in the name
+        //of the file containing the sprites for this animation, a vector of which sprites belong
+        //in the animation (in order), the width and height of the sprites, the time between sprites (in ms),
+        //and the color of the alpha mask
+	void ApplyCurrentSprite(int x, int y, SDL_Surface* destination);
+	void ApplyFirstSprite(int x, int y, SDL_Surface* destination);
+	void ApplyLastSprite(int x, int y, SDL_Surface* destination);
+	void Begin();
 };
 
 #endif

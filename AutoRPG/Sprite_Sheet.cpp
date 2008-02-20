@@ -5,8 +5,12 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string filename, int red, int green, int blue)
+std::list<Sprite_Sheet*> Sprite_Sheet::spriteSheetList;
+
+Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int red, int green, int blue)
 {
+    filename = file;
+
     //Loads the file to the surface screen, with the alphamask indicated by red, green, and blue
     SDL_Surface *loadedImage = NULL;
 	SDL_Surface *sheet = NULL;
@@ -47,6 +51,8 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string filename, i
     }
 
     SDL_FreeSurface(sheet); //Free this memory
+
+    spriteSheetList.push_back(this);
 }
 
 Sprite_Sheet::~Sprite_Sheet()
@@ -58,6 +64,7 @@ Sprite_Sheet::~Sprite_Sheet()
             SDL_FreeSurface(sprites[i]);
         }
     }
+    spriteSheetList.remove(this);
 }
 
 void Sprite_Sheet::ApplySprite(int x, int y, int spriteNum, SDL_Surface* destination)
@@ -71,4 +78,43 @@ void Sprite_Sheet::ApplySprite(int x, int y, int spriteNum, SDL_Surface* destina
     offset.x = x;
     offset.y = y;
     SDL_BlitSurface(sprites[spriteNum], NULL, destination, &offset);
+}
+
+bool Sprite_Sheet::operator ==(Sprite_Sheet* compare)
+{
+    return (filename == compare->filename);
+}
+
+Sprite_Sheet* Sprite_Sheet::FindSheet(std::string file)
+{
+    for (std::list<Sprite_Sheet*>::iterator i = spriteSheetList.begin(); i != spriteSheetList.end(); i++)
+    {
+        if ((*i)->filename == file)
+        {
+            return (*i);
+        }
+    }
+    return NULL;
+}
+
+void Sprite_Sheet::CleanUp()
+{
+    for (std::list<Sprite_Sheet*>::iterator i = spriteSheetList.begin(); i != spriteSheetList.end(); i++)
+    {
+        if ((*i) != NULL)
+        {
+            delete (*i);
+        }
+    }
+}
+
+void Sprite_Sheet::PrintList()
+{
+    int j = 0;
+    printf("\nPrinting spriteList:\n");
+    for (std::list<Sprite_Sheet*>::iterator i = spriteSheetList.begin(); i != spriteSheetList.end(); i++)
+    {
+        printf("    List value %i is %i\n", j, (*i));
+        j++;
+    }
 }

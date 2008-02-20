@@ -3,104 +3,57 @@
 #include <SDL/SDL.h>
 #include <math.h>
 
-//The constructor
-Animation::Animation(std::vector<SDL_Rect> animation, int clipTime /*default: 120*/)
+//The constructor. Needs the name of the file from which to get the sprites, the width and height of the sprites, the
+//indexes of all of the sprites (ie which sprites to use in which order), the clip time, and the color for the alpha mask
+Animation::Animation(std::string file, int spriteW, int spriteH, std::vector<int> spriteIndexes, int clipTime /*default: 120*/,
+    int red /*default: 0*/, int green /*default: 255*/, int blue /*default: 255*/)
 {
-	for (int i=0; i<int(animation.size()); i++)
-	{
-		animSeries.push_back(animation[i]);
-	}
-	currentClip = &animSeries[0];
-	lastAnimTime = SDL_GetTicks();
-	animationLoc = 0;
-	clipLength = clipTime;
-	numClips = animSeries.size();
+    spriteSheet = Sprite_Sheet::FindSheet(file);    //See if this animation already exists in loaded memory
+    if (spriteSheet == NULL)    //If it doesn't, load up a new one
+    {
+        spriteSheet = new Sprite_Sheet(spriteW, spriteH, file, red, green, blue);
+    }
+
+    sprites.resize(spriteIndexes.size());
+    for (int i = 0; i < sprites.size(); i++)
+    {
+        sprites[i] = spriteIndexes[i];
+    }
+    clipLength = clipTime;
+    currentSprite = sprites.begin();
+    lastAnimTime = SDL_GetTicks();
 }
 
-//Freeing the vector memory. I think that this should automatically be done when the
-//default constructor is called, but I wanted to be safe
-Animation::~Animation()
+//Applys whatever the current sprite of the animation is to the surface in destination at the coordinates x, y
+void Animation::ApplyCurrentSprite(int x, int y, SDL_Surface* destination)
 {
-	animSeries.clear();
+    if (SDL_GetTicks() - lastAnimTime > clipLength) //If enough time has passed
+    {
+        currentSprite ++;   //Go to the next sprite
+        if (currentSprite == sprites.end()) //If you are at the end, go back to the beginning
+        {
+            currentSprite = sprites.begin();
+        }
+        lastAnimTime = SDL_GetTicks();
+    }
+    spriteSheet->ApplySprite(x, y, (*currentSprite), destination);  //Apply sprite
 }
 
-//Return an individual clip based on its index
-SDL_Rect Animation::operator [](int i)
+//What it says
+void Animation::ApplyFirstSprite(int x, int y, SDL_Surface* destination)
 {
-	return GetClip(i);
+    spriteSheet->ApplySprite(x, y, (*(sprites.begin())), destination);
 }
 
-//Return an individual clip based on its index
-SDL_Rect Animation::GetClip(int index)
+//What it says
+void Animation::ApplyLastSprite(int x, int y, SDL_Surface* destination)
 {
-    if (index < int(animSeries.size()))
-	{
-		return animSeries[index];
-	}
-	else
-	{
-		SDL_Rect newRect = {0, 0, 0, 0};
-		return newRect;
-	}
+    spriteSheet->ApplySprite(x, y, (*(sprites.rbegin())), destination);
 }
 
-Animation Animation::operator =(Animation anim)
-{
-	for (int i=0; i<int(anim.numClips); i++)
-	{
-		animSeries.push_back(anim.animSeries[i]);
-	}
-	return anim;
-}
-
+//Begin the animation (ie reset the animation to the beginning
 void Animation::Begin()
 {
     lastAnimTime = SDL_GetTicks();
-    animationLoc = 0;
-    currentClip = &animSeries[0];
-}
-
-void Animation::Update()
-{
-    if (SDL_GetTicks() - lastAnimTime >= clipLength)    //Only update if enough time has passed
-    {
-        animationLoc += floor((SDL_GetTicks() - lastAnimTime)/((double)clipLength));
-        while (animationLoc >= numClips)
-        {
-            animationLoc -= numClips;
-        }
-        currentClip = &animSeries[animationLoc];
-        lastAnimTime = SDL_GetTicks();
-    }
-}
-
-//Returns the number of clips in this animation
-int Animation::size()
-{
-	return numClips;
-}
-
-SDL_Rect Animation::GetCurrentClip()
-{
-    return *currentClip;
-}
-
-//Returns the final clip in the animation
-SDL_Rect Animation::GetFinalClip()
-{
-	if (numClips != 0)
-	{
-		return animSeries[numClips - 1];
-	}
-	return SDL_Rect();
-}
-
-//Return the first clip in the animation
-SDL_Rect Animation::GetFirstClip()
-{
-	if (numClips != 0)
-	{
-		return animSeries[0];
-	}
-	return SDL_Rect();
+    currentSprite = sprites.begin();
 }

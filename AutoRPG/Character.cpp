@@ -17,160 +17,73 @@ Character::Character(int locx, int locy, int width, int height,
 
 	vel.x = 0;
 	vel.y = 0;
-	acc.x = 0;
-	acc.y = 0;
-	mass = 100;
 
 	//Set up the animations, based on the current layout of the spritesheets. Should be within the character class
 	//since all character spritesheets should be set up in the same way (so says I!)
-	std::vector<SDL_Rect> AnimLeft;     //Moving left
-	AnimLeft.resize(4);
-	AnimLeft[0].x = 48;
-	AnimLeft[0].y = 192;
-	AnimLeft[0].w = 48;
-	AnimLeft[0].h = 64;
+    //Walking
+	std::vector<int> animLeft;
+	animLeft.push_back(19);
+	animLeft.push_back(18);
+	animLeft.push_back(19);
+	animLeft.push_back(20);
+	AddAnimation(animLeft);
 
-	AnimLeft[1].x = 0;
-	AnimLeft[1].y = 192;
-	AnimLeft[1].w = 48;
-	AnimLeft[1].h = 64;
+    std::vector<int> animRight;
+	animRight.push_back(7);
+	animRight.push_back(6);
+	animRight.push_back(7);
+	animRight.push_back(8);
+	AddAnimation(animRight);
 
-	AnimLeft[2] = AnimLeft[0];
+    std::vector<int> animUp;
+	animUp.push_back(1);
+	animUp.push_back(0);
+	animUp.push_back(1);
+	animUp.push_back(2);
+	AddAnimation(animUp);
 
-	AnimLeft[3].x = 96;
-	AnimLeft[3].y = 192;
-	AnimLeft[3].w = 48;
-	AnimLeft[3].h = 64;
+    std::vector<int> animDown;
+	animDown.push_back(13);
+	animDown.push_back(12);
+	animDown.push_back(13);
+	animDown.push_back(14);
+	AddAnimation(animDown);
 
-    std::vector<SDL_Rect> AnimRight;    //Moving right
-	AnimRight.resize(4);
-	AnimRight[0].x = 0;
-	AnimRight[0].y = 64;
-	AnimRight[0].w = 48;
-	AnimRight[0].h = 64;
+	//Jumping
+    std::vector<int> animJumpLeft;
+	animJumpLeft.push_back(19);
+	AddAnimation(animJumpLeft);
 
-	AnimRight[1].x = 48;
-	AnimRight[1].y = 64;
-	AnimRight[1].w = 48;
-	AnimRight[1].h = 64;
+    std::vector<int> animJumpRight;
+	animJumpRight.push_back(7);
+	AddAnimation(animJumpRight);
 
-	AnimRight[2].x = 96;
-	AnimRight[2].y = 64;
-	AnimRight[2].w = 48;
-	AnimRight[2].h = 64;
+    std::vector<int> animJumpUp;
+	animJumpUp.push_back(1);
+	AddAnimation(animJumpUp);
 
-	AnimRight[3] = AnimRight[1];
+    std::vector<int> animJumpDown;
+	animJumpDown.push_back(13);
+	AddAnimation(animJumpDown);
 
-	std::vector<SDL_Rect> AnimUp;   //Moving up
-	AnimUp.resize(4);
-	AnimUp[0].x = 48;
-	AnimUp[0].y = 0;
-	AnimUp[0].w = 48;
-	AnimUp[0].h = 64;
+	//Standing still
+    std::vector<int> animStillLeft;
+	animStillLeft.push_back(19);
+	AddAnimation(animStillLeft);
 
-	AnimUp[1].x = 0;
-	AnimUp[1].y = 0;
-	AnimUp[1].w = 48;
-	AnimUp[1].h = 64;
+    std::vector<int> animStillRight;
+	animStillRight.push_back(7);
+	AddAnimation(animStillRight);
 
-	AnimUp[2] = AnimUp[0];
-	AnimUp[3].x = 96;
-	AnimUp[3].y = 0;
-	AnimUp[3].w = 48;
-	AnimUp[3].h = 64;
+    std::vector<int> animStillUp;
+	animStillUp.push_back(1);
+	AddAnimation(animStillUp);
 
-	std::vector<SDL_Rect> AnimDown;   //Moving down
-	AnimDown.resize(4);
-	AnimDown[0].x = 48;
-	AnimDown[0].y = 128;
-	AnimDown[0].w = 48;
-	AnimDown[0].h = 64;
+    std::vector<int> animStillDown;
+	animStillDown.push_back(13);
+	AddAnimation(animStillDown);
 
-	AnimDown[1].x = 0;
-	AnimDown[1].y = 128;
-	AnimDown[1].w = 48;
-	AnimDown[1].h = 64;
-
-	AnimDown[2] = AnimDown[0];
-
-	AnimDown[3].x = 96;
-	AnimDown[3].y = 128;
-	AnimDown[3].w = 48;
-	AnimDown[3].h = 64;
-
-    //Currently, jumping is just the same animation as standing still, but in midair
-    //Eventually, this will probably change, but at that point, the only part of the code that
-    //will need to be changed is the next few lines.
-	std::vector<SDL_Rect> AnimJumpLeft;     //Jumping, facing left
-	AnimJumpLeft.resize(1);
-	AnimJumpLeft[0].x = 48;
-	AnimJumpLeft[0].y = 192;
-	AnimJumpLeft[0].w = 48;
-	AnimJumpLeft[0].h = 64;
-
-	std::vector<SDL_Rect> AnimJumpRight;    //Jumping, facing right
-	AnimJumpRight.resize(1);
-	AnimJumpRight[0].x = 48;
-	AnimJumpRight[0].y = 64;
-	AnimJumpRight[0].w = 48;
-	AnimJumpRight[0].h = 64;
-
-	std::vector<SDL_Rect> AnimJumpUp;    //Jumping, facing up
-	AnimJumpUp.resize(1);
-	AnimJumpUp[0].x = 48;
-	AnimJumpUp[0].y = 0;
-	AnimJumpUp[0].w = 48;
-	AnimJumpUp[0].h = 64;
-
-	std::vector<SDL_Rect> AnimJumpDown;    //Jumping, facing down
-	AnimJumpDown.resize(1);
-	AnimJumpDown[0].x = 48;
-	AnimJumpDown[0].y = 128;
-	AnimJumpDown[0].w = 48;
-	AnimJumpDown[0].h = 64;
-
-	std::vector<SDL_Rect> AnimStillLeft;    //Standing, facing left
-	AnimStillLeft.resize(1);
-	AnimStillLeft[0].x = 48;
-	AnimStillLeft[0].y = 192;
-	AnimStillLeft[0].w = 48;
-	AnimStillLeft[0].h = 64;
-
-	std::vector<SDL_Rect> AnimStillRight;   //Standing, facing right
-	AnimStillRight.resize(1);
-	AnimStillRight[0].x = 48;
-	AnimStillRight[0].y = 64;
-	AnimStillRight[0].w = 48;
-	AnimStillRight[0].h = 64;
-
-	std::vector<SDL_Rect> AnimStillUp;   //Standing, facing up
-	AnimStillUp.resize(1);
-	AnimStillUp[0].x = 48;
-	AnimStillUp[0].y = 0;
-	AnimStillUp[0].w = 48;
-	AnimStillUp[0].h = 64;
-
-	std::vector<SDL_Rect> AnimStillDown;   //Standing, facing down
-	AnimStillDown.resize(1);
-	AnimStillDown[0].x = 48;
-	AnimStillDown[0].y = 128;
-	AnimStillDown[0].w = 48;
-	AnimStillDown[0].h = 64;
-
-	AddAnimation(AnimLeft); //Push them all back, in the order of the enums related to them
-	AddAnimation(AnimRight);
-	AddAnimation(AnimUp);
-	AddAnimation(AnimDown);
-	AddAnimation(AnimJumpLeft);
-	AddAnimation(AnimJumpRight);
-	AddAnimation(AnimJumpUp);
-	AddAnimation(AnimJumpDown);
-	AddAnimation(AnimStillLeft);
-	AddAnimation(AnimStillRight);
-	AddAnimation(AnimStillUp);
-	AddAnimation(AnimStillDown);
-
-    currentAnim = &animList[ANIM_STILLRIGHT];   //Always begin facing right, although this should be changed almost immediately
+    ChangeAnimation(&animList[ANIM_STILLRIGHT]);   //Always begin facing right, although this should be changed almost immediately
         //in almost all circumstances
 }
 
@@ -179,10 +92,15 @@ void Character::AddAnimation(Animation animation)
 	animList.push_back(animation);
 }
 
+void Character::AddAnimation(std::vector<int> animation)
+{
+    animList.push_back(Animation("images/miniDungeonCharSprites2x.png", 48, 64, animation, 120, 255, 0, 0));
+}
+
 void Character::UpdatePosition()
 {
     double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
-//    printf("Seconds passed: %f\n", secsPassed);
+    printf("Seconds passed: %f\n", secsPassed);
 	pos.x += vel.x * secsPassed;
 	pos.y += vel.y * secsPassed;
 
@@ -209,11 +127,8 @@ void Character::UpdatePosition()
 
 void Character::UpdateAnimation()
 {
-    currentAnim->Update();  //The animation will determine what the appropriate current clip is, based
-        //on the current time
+    currentAnim->ApplyCurrentSprite(pos.x, pos.y, destination);
 
-    //Apply the image appropriately
-	Graphics::ApplyImage(pos.x, pos.y, source, destination, &currentAnim->GetCurrentClip());
 	lastTime = SDL_GetTicks();  //Update the lastTime function
 }
 

@@ -2,15 +2,18 @@
 #include <string>
 #include <iostream>
 
+
 const int AUTORPG_SERVER_PORT = 2000;
 
 int main ( int argc, char** argv )
 {
 
     //This code is gold, NEVER lose it
-    //This code remaps stderr and stdout back to where they were (Against the wishes of SDL_net for some reason);
+    //This code remaps stderr and stdout back to where they were (Against the wishes of SDL_net for some reason) WINDOWS ONLY;
+#ifdef WINDOWS
     freopen( "CON", "w", stdout );
     freopen( "CON", "w", stderr );
+#endif
 
     std::cout << "Entering AutoRPG Server Main loop\n";
 
@@ -57,9 +60,8 @@ int main ( int argc, char** argv )
 			if ((remoteIP = SDLNet_TCP_GetPeerAddress(csd))) {
 				// Print the address, converting in the host format
 				std::cout << "Host connected from " << SDLNet_Read32(&remoteIP->host) << " on port" << SDLNet_Read16(&remoteIP->port) << "\r\n";
-
 				std::string greeting = "Welcome to AutoServer for AutoRPG (http://autorpg.googlecode.com/)\r\n";
-				SDLNet_TCP_Send(csd, greeting.c_str(), greeting.length() + 1);
+				SDLNet_TCP_Send(csd, const_cast<char *>(greeting.c_str()), greeting.length() + 1); // this god awful hack is because SDLNET_TCP_Send doesn't accept a constant char * in linux but in windows it works, strange.
 			}
 			else {
 				fprintf(stderr, "SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());

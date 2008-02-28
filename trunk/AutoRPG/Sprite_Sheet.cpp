@@ -1,5 +1,6 @@
 #include "Sprite_Sheet.h"
 #include "constants.h"
+#include "Point.h"
 #include <string>
 #include <stdio.h>
 #include <SDL/SDL.h>
@@ -22,9 +23,7 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
 	}
 
     int numx = (sheet->w)/wOfSprite;  //Number of sprites in the x direction
-    printf("numx = %i\n", numx);
     int numy = (sheet->h)/hOfSprite;  //Number of sprites in the y direction
-    printf("numy = %i\n", numy);
 
     //This part sets up the vector of sprites to empty surfaces
     sprites.resize(numx*numy);
@@ -32,7 +31,6 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
     {
         sprites[i] = SDL_CreateRGBSurface(SDL_SWSURFACE, wOfSprite, hOfSprite, SCREEN_BPP, NULL, NULL, NULL, NULL);
     }
-    printf("sprites is now of size: %i\n", sprites.size());
     SDL_Rect clip;
     clip.w = wOfSprite;
     clip.h = hOfSprite;
@@ -49,6 +47,11 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
             SDL_BlitSurface(sheet, &clip, sprites[i*numx + j], NULL);
         }
     }
+
+    spriteDim.x = wOfSprite;    //Set the spriteDimentions
+    spriteDim.y = hOfSprite;
+    printf("wOfSprite is %i, hOfSprite is %i\n", wOfSprite, hOfSprite);
+    printf("spriteDim.x is %f, spriteDim.y is %f\n", spriteDim.x, spriteDim.y);
 
     SDL_FreeSurface(sheet); //Free this memory
 
@@ -83,6 +86,11 @@ void Sprite_Sheet::ApplySprite(int x, int y, int spriteNum, SDL_Surface* destina
 bool Sprite_Sheet::operator ==(Sprite_Sheet* compare)
 {
     return (filename == compare->filename);
+}
+
+Point Sprite_Sheet::GetSpriteDimension()
+{
+    return spriteDim;
 }
 
 Sprite_Sheet* Sprite_Sheet::FindSheet(std::string file)

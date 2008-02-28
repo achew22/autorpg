@@ -36,7 +36,7 @@ void Graphics::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destin
 bool Graphics::Init()
 {
         if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
-        screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE/* | SDL_NOFRAME*/);
+        screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF/* | SDL_NOFRAME*/);
         if (screen == NULL) {return false;}
         SDL_WM_SetCaption("AutoRPG - Development", NULL);
         return true;

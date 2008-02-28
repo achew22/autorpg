@@ -8,4 +8,4 @@ AutoRPG depends on [http://www.libsdl.org SDL] and [http://www.libsdl.org/projec
 
 = Compiling =
 
-Organize the code with all of the sources, headers, and the image folder in the same directory. No big deal.
+A very basic makefile is provided, which assumes that you have SDL, SDL_image, and g++. If you don't have these, the makefile won't work.

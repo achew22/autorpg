@@ -177,6 +177,11 @@ Point Character::GetPosition()
     return pos;
 }
 
+std::string Character::GetId()
+{
+    return id;
+}
+
 void Character::Jump()
 {
     if (flagList[FLAG_JUMPING] == 0)    //If not already jumping

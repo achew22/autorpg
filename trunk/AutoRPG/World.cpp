@@ -24,6 +24,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <map>
 
 World::World(std::string filename)
 {
@@ -39,4 +40,24 @@ World::World(std::string filename)
     }
 
     fileIn.close();
+}
+
+void World::AddCharacter(Character* character)
+{
+    characterMap.insert(std::pair<std::string, Character*>(character->GetId(), character));
+}
+
+void World::RemoveCharacter(std::string id)
+{
+    characterMap.erase(id);
+}
+
+Character* World::GetCharacter(std::string id)
+{
+    std::map<std::string, Character*>::iterator i = characterMap.find(id);
+    if (i != characterMap.end())
+    {
+        return (*i).second;
+    }
+    return NULL;
 }

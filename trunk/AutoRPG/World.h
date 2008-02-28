@@ -34,6 +34,9 @@ private:
     std::string file;
 public:
     World(std::string filename);
+    void AddCharacter(Character* character);
+    void RemoveCharacter(std::string id);
+    Character* GetCharacter(std::string id);
 };
 
 #endif

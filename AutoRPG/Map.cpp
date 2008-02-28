@@ -1,3 +1,23 @@
+/*
+Copyright 2007, 2008 Andrew Allen and Brian Shourd
+
+This file is part of AutoRPG.
+
+AutoRPG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AutoRPG is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AutoRPG (Called LICENSE.txt).  If not, see
+<http://www.gnu.org/licenses/>.
+*/
+
 #include "Map.h"
 #include "Point.h"
 #include "Conversions.h"
@@ -8,34 +28,6 @@
 #include <string>
 #include <vector>
 #include <cmath>
-
-Map::Map(std::string spriteIdsFile)
-{
-    std::ifstream fileIn(spriteIdsFile.c_str());
-    std::string line = "";   //the current line
-
-    while (!fileIn.eof())
-    {
-        getline(fileIn, line);
-        line += " END__";
-        std::string buffer = "";
-        std::istringstream stringIn;
-        stringIn.str(line);
-        std::vector<int> tempLine;
-        stringIn >> buffer;
-        while (buffer != "END__")
-        {
-            tempLine.push_back(StringToInt(buffer));
-            stringIn >> buffer;
-        }
-        spriteIds.push_back(tempLine);
-    }
-
-    fileIn.close();
-
-    spriteDim.x = 1;
-    spriteDim.y = 1;
-}
 
 Map::Map(std::string mapFile, std::string pictureFile)
 {
@@ -61,7 +53,7 @@ Map::Map(std::string mapFile, std::string pictureFile)
         stringIn >> buffer;
         while (buffer != "END__")
         {
-            tempLine.push_back(StringToInt(buffer));
+            tempLine.push_back(Conversions::StringToInt(buffer));
             stringIn >> buffer;
         }
         spriteIds.push_back(tempLine);
@@ -74,33 +66,6 @@ Map::Map(std::string mapFile, std::string pictureFile)
     {
         spriteSheet = new Sprite_Sheet(spriteDim.x, spriteDim.y, pictureFile);
     }
-}
-
-int Map::StringToInt(std::string in)
-{
-    int total = 0;
-    for (int i = 0; i < in.size(); i++)
-    {
-        total += pow(10.0, in.size() - (i + 1)) * (in[i] - '0');
-    }
-    return total;
-}
-
-void Map::AssignSpriteSheet(Sprite_Sheet* sheet)
-{
-    spriteSheet = sheet;
-    spriteDim = sheet->GetSpriteDimension();
-}
-
-void Map::AssignSpriteSheet(int wOfSprite, int hOfSprite, std::string file,
-    int red /*= 0*/, int green /*= 255*/, int blue /*= 255*/)
-{
-    spriteSheet = Sprite_Sheet::FindSheet(file);
-    if (spriteSheet == NULL)
-    {
-        spriteSheet = new Sprite_Sheet(wOfSprite, hOfSprite, file, red, green, blue);
-    }
-    spriteDim = spriteSheet->GetSpriteDimension();
 }
 
 void Map::ApplyMap(int x, int y, int w, int h, SDL_Surface* destination)

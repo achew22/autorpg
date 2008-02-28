@@ -1,8 +1,9 @@
 #include "constants.h"
 #include "Instance.h"
 #include "Character.h"
-#include "Dynamic_Object.h"
 #include "Graphics.h"
+#include "Conversions.h"
+
 #include <stdio.h>
 
 int main(int argc, char *args[])
@@ -10,25 +11,17 @@ int main(int argc, char *args[])
     Graphics graphics;
    	if (!graphics.Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
 
-//    Instance instance2(0, 100, graphics.GetScreen());
     Instance instance1(0, 0, graphics.GetScreen());
 
-	if (!instance1.LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+	if (!instance1.LoadFiles()) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+	instance1.LoadMap("maps/map1.txt", "maps/map1.gif");
 	instance1.SetUpDynamicObjects();
-	instance1.CreateBackground();
 	if (!instance1.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
-
-/*	if (!instance2.LoadFiles("images/dynamicobjects2x.png", "images/bgTiles2x.png", "images/miniDungeonCharSprites2x.png")) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
-	instance2.SetUpDynamicObjects();
-	instance2.CreateBackground();
-	if (!instance2.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}*/
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
-    int time = 0;
 	while (quit != true)
 	{
-	    time = SDL_GetTicks();  //This is the current time since initialization, in milliseconds (used for capping the frame rate)
 		if (SDL_PollEvent(&SDLEvent))
 		{
 			if (SDLEvent.type == SDL_KEYDOWN)
@@ -92,12 +85,10 @@ int main(int argc, char *args[])
 			}
 		}
 		if (!instance1.Update()) {return 1;}    //Update
-//		if (!instance2.Update()) {return 1;}    //Update
 		if (!graphics.Update()) {return 1;}     //Update
 	}
 
 	instance1.CleanUp();    //Clean up all dynamically allocated memory
-//	instance2.CleanUp();
 	graphics.CleanUp();
 
 	return 0;

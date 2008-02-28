@@ -28,18 +28,3 @@ bool Point::operator !=(Point toEqual)
 {
     return !(toEqual == *this);
 }
-
-Point Point::operator +(Point toAdd)
-{
-    return Point(x + toAdd.x, y + toAdd.y);
-}
-
-Point Point::operator -(Point toSubtract)
-{
-    return Point(x - toSubtract.x, y - toSubtract.y);
-}
-
-Point Point::fakeFunc(int fake)
-{
-    return *this;
-}

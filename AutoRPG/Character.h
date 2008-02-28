@@ -1,21 +1,40 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-#include "Dynamic_Object.h"
 #include "Animation.h"
+#include "Slot.h"
+#include "Point.h"
+#include "Sector.h"
+#include "Area.h"
+
 #include <SDL/SDL.h>
 #include <map>
 #include <string>
 #include <vector>
-#include "Point.h"
 
 //The class for any and all characters in the game.
-class Character : public Dynamic_Object
+class Character
 {
 private:
+    Point pos;  //Position
+	Point dim;  //Dimensions
 	Point vel;	//Velocity in pixels per second
 	Point init; //Initialized values
 	std::string id;  //The unique id of this character
+	std::vector<Slot> inventory;    //The inventory
+
+    int lastTime;   //The time (in ms) of the last time Update was called. Allows for the positions, etc. to be adjusted
+        //independently of frame rate.
+	//SDL_Surface *source;	//A pointer to the surface containing the sprites
+	SDL_Surface *destination; //A pointer to the surface where the sprites should be blitted to
+	std::vector<Animation> animList;	//A list of the different possible animations
+	std::vector<int> flagList;	//A list of all of the flags
+    Animation* currentAnim; //A pointer to the current animation being used
+
+    Sector* currentSector;  //The current Sector
+    Area* currentArea;  //The current Area
+
+	double fpsTicks, fpsFrames; //Used for calculating framerate
 	enum
 	{
 		FLAG_FACING,	    //The flag indicating which way the character is facing
@@ -38,12 +57,12 @@ private:
 		ANIM_STILLDOWN,     //standing still, facing down
 	};
 public:
-	Character(int locx, int locy, int width, int height, SDL_Surface *sourceSurface, SDL_Surface *destinationSurface, std::string ID);
-	virtual void AddAnimation(Animation animation);
-	virtual void AddAnimation(std::vector<int> animation);
-	virtual void UpdatePosition();  //Updates the position based on velocity and acceleration
-	virtual void UpdateAnimation();	//Updates the surface on which the character should be updated
-    //virtual Point GetPosition();
+	Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, std::string ID);
+	void AddAnimation(std::vector<int> animation, std::string filename = "images/miniDungeonCharSprites2x.png");
+	void ChangeAnimation(Animation* animation);
+    void UpdatePosition();  //Updates the position based on velocity and acceleration
+	void UpdateAnimation();	//Updates the surface on which the character should be updated
+    Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
 	Point GetVelocity();	//Returns the velocity
 	void Jump();

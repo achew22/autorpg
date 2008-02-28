@@ -114,7 +114,7 @@ bool Instance::Update()
 void Instance::SetUpDynamicObjects()
 {
 	player = new Character(20, 32, 48, 64, dynamicLayer, "player");
-	characterList.insert(characterList.begin(), std::pair<std::string, Character*>("player", player));
+	characterList.insert(std::pair<std::string, Character*>("player", player));
 }
 
 Character* Instance::GetPlayer()

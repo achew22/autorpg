@@ -22,4 +22,5 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 Fake_Server::Fake_Server()
 {
+
 }

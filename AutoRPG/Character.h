@@ -85,6 +85,7 @@ public:
     Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
 	Point GetVelocity();	//Returns the velocity
+	std::string GetId();    //Returns the id
 	void Jump();
 	void StopJump();
 	void MoveRight();

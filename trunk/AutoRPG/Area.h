@@ -37,7 +37,7 @@ class Area
 private:
     std::string name;
     Point dim;
-    std::map<std::string, Character*> characterMap;
+    std::map<int, Character*> characterMap;
     Map* map;
     std::vector< std::vector<Sector*> > sectorVect;
 public:

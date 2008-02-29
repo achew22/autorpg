@@ -44,20 +44,25 @@ World::World(std::string filename)
 
 void World::AddCharacter(Character* character)
 {
-    characterMap.insert(std::pair<std::string, Character*>(character->GetId(), character));
+    characterMap.insert(std::pair<int, Character*>(character->GetId(), character));
 }
 
-void World::RemoveCharacter(std::string id)
+void World::RemoveCharacter(int id)
 {
     characterMap.erase(id);
 }
 
-Character* World::GetCharacter(std::string id)
+Character* World::GetCharacter(int id)
 {
-    std::map<std::string, Character*>::iterator i = characterMap.find(id);
+    std::map<int, Character*>::iterator i = characterMap.find(id);
     if (i != characterMap.end())
     {
         return (*i).second;
     }
     return NULL;
+}
+
+std::map<int, Character*>* World::GetCharacterMap()
+{
+    return &characterMap;
 }

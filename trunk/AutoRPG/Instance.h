@@ -30,8 +30,6 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Character.h"
 #include "Map.h"
 
-//Just a namespace of Graphics-related functions. Should eventually be turned into a class, since it is not really OOP
-//to have all these global functions and global variables
 class Instance
 {
 private:
@@ -40,7 +38,7 @@ private:
         //A very important surface. All of the dynamic objects should update to this surface, in order from
         //back to front. This surface will eventually be blitted to the screen, but only at the very last possible
         //moment.
-    std::map<std::string, Character*> characterList;    //Pointers to the lists that will need to be updated that exist in this instace of graphics
+    std::map<int, Character*> characterMap;    //Pointers to the lists that will need to be updated that exist in this instace of graphics
     Character* player;
     Map* map;
 public:

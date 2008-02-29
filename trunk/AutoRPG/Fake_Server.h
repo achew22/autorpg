@@ -22,7 +22,11 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "World.h"
+#include "Event_Manager.h"
+#include "Event.h"
+#include "Quest.h"
 
+#include <map>
 #include <string>
 
 //Returns everything as a string, since everything ought to be serialized. This means that it
@@ -30,10 +34,14 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 class Fake_Server
 {
 private:
-    World* theWorld;
+    World* world;
+    Event_Manager* eventManager;
+    std::map<int, Quest*> questMap;
 public:
-    Fake_Server();
-    std::string getQuest(int id);
+    Fake_Server(std::string filename);
+    Quest* GetQuest(int id);
+    void InEvent(std::string event);
+    std::string RegisterClient(int clientId, int characterId);
 };
 
 #endif

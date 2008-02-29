@@ -21,8 +21,11 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Character.h"
 #include "Instance.h"
 #include "Graphics.h"
+#include "Conversions.h"
 
-Character::Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, std::string ID)
+#include <sstream>
+
+Character::Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID)
 {
 	flagList.push_back(1);	//Facing flag: 1-left, 2-right, 3-up, 4-down
 	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
@@ -43,10 +46,109 @@ Character::Character(int locx, int locy, int width, int height, SDL_Surface *des
 	lastTime = SDL_GetTicks();
 
 	animList.clear();	//Just make sure that these are all clear
-	flagList.clear();
+	//flagList.clear();
 
-	currentSector = NULL;
-	currentArea = NULL;
+	//Set up the animations, based on the current layout of the spritesheets. Should be within the character class
+	//since all character spritesheets should be set up in the same way (so says I!)
+    //Walking
+	std::vector<int> animLeft;
+	animLeft.push_back(19);
+	animLeft.push_back(18);
+	animLeft.push_back(19);
+	animLeft.push_back(20);
+	AddAnimation(animLeft);
+
+    std::vector<int> animRight;
+	animRight.push_back(7);
+	animRight.push_back(6);
+	animRight.push_back(7);
+	animRight.push_back(8);
+	AddAnimation(animRight);
+
+    std::vector<int> animUp;
+	animUp.push_back(1);
+	animUp.push_back(0);
+	animUp.push_back(1);
+	animUp.push_back(2);
+	AddAnimation(animUp);
+
+    std::vector<int> animDown;
+	animDown.push_back(13);
+	animDown.push_back(12);
+	animDown.push_back(13);
+	animDown.push_back(14);
+	AddAnimation(animDown);
+
+	//Jumping
+    std::vector<int> animJumpLeft;
+	animJumpLeft.push_back(19);
+	AddAnimation(animJumpLeft);
+
+    std::vector<int> animJumpRight;
+	animJumpRight.push_back(7);
+	AddAnimation(animJumpRight);
+
+    std::vector<int> animJumpUp;
+	animJumpUp.push_back(1);
+	AddAnimation(animJumpUp);
+
+    std::vector<int> animJumpDown;
+	animJumpDown.push_back(13);
+	AddAnimation(animJumpDown);
+
+	//Standing still
+    std::vector<int> animStillLeft;
+	animStillLeft.push_back(19);
+	AddAnimation(animStillLeft);
+
+    std::vector<int> animStillRight;
+	animStillRight.push_back(7);
+	AddAnimation(animStillRight);
+
+    std::vector<int> animStillUp;
+	animStillUp.push_back(1);
+	AddAnimation(animStillUp);
+
+    std::vector<int> animStillDown;
+	animStillDown.push_back(13);
+	AddAnimation(animStillDown);
+
+    ChangeAnimation(&animList[ANIM_STILLRIGHT]);   //Always begin facing right, although this should be changed almost immediately
+        //in almost all circumstances
+
+    fpsTicks = SDL_GetTicks();
+    fpsFrames = 0;
+}
+
+Character::Character(std::string serialized)
+{
+	flagList.push_back(1);	//Facing flag: 1-left, 2-right, 3-up, 4-down
+	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
+	flagList.push_back(0);  //Jumping flag: 0-not jumping, 1-jumping
+
+    std::stringstream inString;
+    inString.str(serialized);
+    std::string temp;
+    inString >> temp;
+    pos.x = Conversions::StringToInt(temp);
+    inString >> temp;
+	pos.y = Conversions::StringToInt(temp);
+    inString >> temp;
+	dim.x = Conversions::StringToInt(temp);
+    inString >> temp;
+	dim.y = Conversions::StringToInt(temp);
+    inString >> temp;
+	vel.x = Conversions::StringToInt(temp);
+    inString >> temp;
+	vel.y = Conversions::StringToInt(temp);
+
+    inString >> temp;
+	id = Conversions::StringToInt(temp);
+
+	destination = NULL;
+	lastTime = SDL_GetTicks();
+
+	animList.clear();	//Just make sure that these are all clear
 
 	//Set up the animations, based on the current layout of the spritesheets. Should be within the character class
 	//since all character spritesheets should be set up in the same way (so says I!)
@@ -122,7 +224,7 @@ Character::Character(int locx, int locy, int width, int height, SDL_Surface *des
 
 void Character::AddAnimation(std::vector<int> animation, std::string filename)
 {
-    animList.push_back(Animation("images/miniDungeonCharSprites2x.png", 48, 64, animation, 120, 255, 0, 0));
+    animList.push_back(Animation(filename, 48, 64, animation, 120, 255, 0, 0));
 }
 
 void Character::ChangeAnimation(Animation* animation)
@@ -149,17 +251,17 @@ void Character::UpdatePosition()
 	{
 		pos.x = 0;
 	}
-	else if (pos.x + dim.x > 4000)
+	else if (pos.x + dim.x > SCREEN_WIDTH)
 	{
-		pos.x = 4000 - dim.x;
+		pos.x = SCREEN_WIDTH - dim.x;
 	}
-    if (pos.y < -30)
+    if (pos.y < 0)
 	{
-	    pos.y = -30;
+	    pos.y = 0;
 	}
-	else if (pos.y + dim.y > 200)
+	else if (pos.y + dim.y > SCREEN_HEIGHT)
 	{
-	    pos.y = 200 - dim.y;
+	    pos.y = SCREEN_HEIGHT - dim.y;
 	}
 
 	lastTime = SDL_GetTicks();  //Update the last time
@@ -177,9 +279,14 @@ Point Character::GetPosition()
     return pos;
 }
 
-std::string Character::GetId()
+int Character::GetId()
 {
     return id;
+}
+
+void Character::AssignClient(int theClientId)
+{
+    clientId = theClientId;
 }
 
 void Character::Jump()
@@ -341,6 +448,19 @@ void Character::StopMoveVert()
 Point Character::GetVelocity()
 {
     return vel;
+}
+
+std::string Character::Serialize()
+{
+    std::string serialized = "";
+    serialized += Conversions::IntToString(pos.x) + " ";
+    serialized += Conversions::IntToString(pos.y) + " ";
+    serialized += Conversions::IntToString(dim.x) + " ";
+    serialized += Conversions::IntToString(dim.y) + " ";
+    serialized += Conversions::IntToString(vel.x) + " ";
+    serialized += Conversions::IntToString(vel.y) + " ";
+    serialized += Conversions::IntToString(id) + " ";
+    return serialized;
 }
 
 void Character::CleanUp()

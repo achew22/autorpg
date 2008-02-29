@@ -28,7 +28,7 @@ Sector::Sector()
 {
 }
 
-void Sector::MoveChar(std::string id, Sector* destination)
+void Sector::MoveChar(int id, Sector* destination)
 {
-    destination->characterMap.insert(destination->characterMap.begin(), std::pair<std::string, Character*>(id, characterMap[id]));
+    destination->characterMap.insert(destination->characterMap.begin(), std::pair<int, Character*>(id, characterMap[id]));
 }

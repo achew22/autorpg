@@ -40,7 +40,7 @@ private:
 	Point dim;  //Dimensions
 	Point vel;	//Velocity in pixels per second
 	Point init; //Initialized values
-	std::string id;  //The unique id of this character
+	int id;  //The unique id of this character
 	std::vector<Slot> inventory;    //The inventory
 
     int lastTime;   //The time (in ms) of the last time Update was called. Allows for the positions, etc. to be adjusted
@@ -51,8 +51,10 @@ private:
 	std::vector<int> flagList;	//A list of all of the flags
     Animation* currentAnim; //A pointer to the current animation being used
 
-    Sector* currentSector;  //The current Sector
-    Area* currentArea;  //The current Area
+    int currentSectorId;  //The current Sector
+    int currentAreaId;  //The current Area
+
+    int clientId;
 
 	double fpsTicks, fpsFrames; //Used for calculating framerate
 	enum
@@ -77,7 +79,8 @@ private:
 		ANIM_STILLDOWN,     //standing still, facing down
 	};
 public:
-	Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, std::string ID);
+	Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID);
+	Character(std::string serialized);
 	void AddAnimation(std::vector<int> animation, std::string filename = "images/miniDungeonCharSprites2x.png");
 	void ChangeAnimation(Animation* animation);
     void UpdatePosition();  //Updates the position based on velocity and acceleration
@@ -85,7 +88,8 @@ public:
     Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
 	Point GetVelocity();	//Returns the velocity
-	std::string GetId();    //Returns the id
+	int GetId();    //Returns the id
+	void AssignClient(int theClientId);
 	void Jump();
 	void StopJump();
 	void MoveRight();
@@ -94,6 +98,7 @@ public:
 	void MoveDown();
 	void StopMoveHoriz();
 	void StopMoveVert();
+	std::string Serialize();
 };
 
 #endif

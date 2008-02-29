@@ -29,14 +29,15 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 class World
 {
 private:
-    std::map<std::string, Character*> characterMap;
+    std::map<int, Character*> characterMap;
     std::vector<Area*> areaVect;
     std::string file;
 public:
     World(std::string filename);
     void AddCharacter(Character* character);
-    void RemoveCharacter(std::string id);
-    Character* GetCharacter(std::string id);
+    void RemoveCharacter(int id);
+    Character* GetCharacter(int id);
+    std::map<int, Character*>* GetCharacterMap();
 };
 
 #endif

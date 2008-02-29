@@ -19,8 +19,62 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "Fake_Server.h"
+#include "Event.h"
+#include "Client.h"
+#include "Event_Manager.h"
+#include "constants.h"
+#include "Conversions.h"
 
-Fake_Server::Fake_Server()
+#include <string>
+#include <fstream>
+#include <sstream>
+
+Fake_Server::Fake_Server(std::string filename)
 {
+    std::ifstream inFile;
+    inFile.open(filename.c_str());
+    std::string line = "";
+    getline(inFile, line);
+    world = new World(line);
+    getline(inFile, line);
+    int locx = 0, locy = 0;
+    std::string temp = "";
+    int i = 0;
+    while (line != "END_")
+    {
+        std::stringstream inString;
+        inString.str(line);
+        inString >> temp;
+        locx = Conversions::StringToInt(temp);
+        inString >> temp;
+        locy = Conversions::StringToInt(temp);
+        world->AddCharacter(new Character(locx, locy, CHARACTER_WIDTH, CHARACTER_HEIGHT, NULL, i));
+        i++;
+        getline(inFile, line);
+    }
+    eventManager = new Event_Manager(world->GetCharacterMap());
+    inFile.close();
+}
 
+Quest* Fake_Server::GetQuest(int id)
+{
+    return questMap[id];
+}
+
+void Fake_Server::InEvent(std::string event)
+{
+    eventManager->AddEvent(event);
+    //Here, it still needs to determine which clients (if any) to send this event to
+}
+
+std::string Fake_Server::RegisterClient(int clientId, int characterId)
+{
+    world->GetCharacter(characterId)->AssignClient(clientId);
+    std::string toSend = "";
+    for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
+    {
+        toSend += i->second->Serialize() + "\n";
+    }
+    toSend += "END_";
+    return toSend;
 }

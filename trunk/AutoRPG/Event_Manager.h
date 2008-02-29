@@ -1,5 +1,5 @@
-#ifndef SECTOR_H
-#define SECTOR_H
+#ifndef EVENT_MANAGER_H
+#define EVENT_MANAGER_H
 
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
@@ -21,20 +21,24 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
-class Character;    //Forward declaration to avoid declaration rings because the Sector class needs to know the Character class,
-    //but the Character class needs to know the Sector class, so neither can be made...
+#include "Event.h"
+#include "Character.h"
 
-#include <vector>
-#include <map>
 #include <string>
+#include <list>
+#include <map>
 
-class Sector
+class Event_Manager
 {
 private:
-    std::map<int, Character*> characterMap;
+    std::list<Event*> eventList;
+    std::map<int, Character*>* characterMap;    //This is only a pointer to a character map because it needs to use an up-to-the-ms
+        //version when Polling events. Thus, the pointer.
 public:
-    Sector();
-    void MoveChar(int id, Sector* destination);
+    Event_Manager(std::map<int, Character*>* pCharacterMap);
+    void AddEvent(std::string eventSerial);
+	void AddEvent(Event* event);
+	void PollEvent();
 };
 
 #endif

@@ -22,9 +22,12 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 //Globals.
-static const int SCREEN_WIDTH = 200;	//Screen width
-static const int SCREEN_HEIGHT = 200;	//Screen height
+static const int SCREEN_WIDTH = 500;	//Screen width
+static const int SCREEN_HEIGHT = 500;	//Screen height
 static const int SCREEN_BPP = 32;	//Screen BPP
+
+const int CHARACTER_WIDTH = 48;
+const int CHARACTER_HEIGHT = 64;
 
 //Some name defining for events. Essentially, while we can just as easily serialize a string and include the word "Attack"
 //in it, we can use the highly efficient switch statement only if the argument of switch is an integer. Thus, the contants

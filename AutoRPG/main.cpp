@@ -23,11 +23,15 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Character.h"
 #include "Graphics.h"
 #include "Conversions.h"
+#include "Fake_Server.h"
+#include "Client.h"
 
 #include <stdio.h>
 
 int main(int argc, char *args[])
 {
+    //Fake_Server server("server/server1.txt");
+
     Graphics graphics;
    	if (!graphics.Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
 

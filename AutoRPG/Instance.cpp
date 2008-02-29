@@ -65,9 +65,12 @@ void Instance::CleanUp()
 //Returns false if an error occurs
 bool Instance::Update()
 {
+    //Clear the screen
+	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
+
 	SDL_Rect screenLocation;	//Defines essentially where the camera is at
-	screenLocation.h = 200;
-	screenLocation.w = 200;
+	screenLocation.h = SCREEN_HEIGHT;
+	screenLocation.w = SCREEN_WIDTH;
 	screenLocation.y = 0;
 
 	//Keep the screenLocation relative to the player's position
@@ -91,7 +94,7 @@ bool Instance::Update()
 	//Check every dynamicObject in our main lists to see if it is close enough to the screen to warrant an update
 	//and then call its update function. I am afraid that this is really inefficient to do EVERY FRAME, but I haven't
 	//yet fixed this problem
-    for (std::map<std::string, Character*>::iterator i = characterList.begin(); i != characterList.end(); i++)
+    for (std::map<int, Character*>::iterator i = characterMap.begin(); i != characterMap.end(); i++)
 	{
 		Point pos = i->second->GetPosition();
 		i->second->UpdatePosition();
@@ -102,9 +105,6 @@ bool Instance::Update()
 		}
 	}
 
-    //Clear the screen
-	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
-
 	//Apply the dynamic layer to the screen layer, with the clip around the screenLocation
 	Graphics::ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
 
@@ -113,8 +113,8 @@ bool Instance::Update()
 
 void Instance::SetUpDynamicObjects()
 {
-	player = new Character(20, 32, 48, 64, dynamicLayer, "player");
-	characterList.insert(std::pair<std::string, Character*>("player", player));
+	player = new Character(20, 32, 48, 64, dynamicLayer, 1);
+	characterMap.insert(std::pair<int, Character*>(1, player));
 }
 
 Character* Instance::GetPlayer()

@@ -1,5 +1,5 @@
-#ifndef SECTOR_H
-#define SECTOR_H
+#ifndef CLIENT_H
+#define CLIENT_H
 
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
@@ -21,20 +21,27 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
-class Character;    //Forward declaration to avoid declaration rings because the Sector class needs to know the Character class,
-    //but the Character class needs to know the Sector class, so neither can be made...
+#include "Event_Manager.h"
+#include "Character.h"
+#include "Sector.h"
+#include "Event.h"
+#include "Fake_Server.h"
 
-#include <vector>
 #include <map>
-#include <string>
+#include <vector>
 
-class Sector
+class Client
 {
 private:
+    int id;
+    Event_Manager* eventManager;
     std::map<int, Character*> characterMap;
+    //std::vector<Sector*> sectorArray;
+    Fake_Server* server;
 public:
-    Sector();
-    void MoveChar(int id, Sector* destination);
+    Client(Fake_Server* theServer, int clientId);
+    void Connect(int characterId);
+    void InEvent(Event* event);
 };
 
 #endif

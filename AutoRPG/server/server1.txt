@@ -1,0 +1,4 @@
+worlds/world1.txt
+20 30
+34 56
+END_ 

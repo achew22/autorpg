@@ -30,17 +30,22 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 int main(int argc, char *args[])
 {
-    //Fake_Server server("server/server1.txt");
-
     Graphics graphics;
-   	if (!graphics.Init()) {printf("Init failed\n"); return 1;} else {printf("Init Success\n");}
+   	if (!graphics.Init()) {printf("Init failed\n"); return 1;}
+
+    Fake_Server server("server/server1.txt");
+    Client client1(&server, 1);
+    Client client2(&server, 2);
+    if (!client1.Connect(1)) {return 1;}
+    if (!client2.Connect(2)) {return 1;}
+    client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
 
     Instance instance1(0, 0, graphics.GetScreen());
 
-	if (!instance1.LoadFiles()) {printf("LoadFiles failed\n"); return 1;} else {printf("LoadFiles Success\n");}
+	if (!instance1.LoadFiles()) {printf("LoadFiles failed\n"); return 1;}
 	instance1.LoadMap("maps/map1.txt", "maps/map1.gif");
 	instance1.SetUpDynamicObjects();
-	if (!instance1.Update()) {printf("Update failed\n"); return 1;} else {printf("Update Success\n");}
+	if (!instance1.Update()) {printf("Update failed\n"); return 1;}
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -48,6 +53,8 @@ int main(int argc, char *args[])
 	{
 		if (SDL_PollEvent(&SDLEvent))
 		{
+		    client1.HandleInput(SDLEvent);
+		    client2.HandleInput(SDLEvent);
 			if (SDLEvent.type == SDL_KEYDOWN)
 			{
 				switch (SDLEvent.key.keysym.sym)
@@ -110,6 +117,9 @@ int main(int argc, char *args[])
 		}
 		if (!instance1.Update()) {return 1;}    //Update
 		if (!graphics.Update()) {return 1;}     //Update
+		if (!client1.Update()) {return 1;}      //Update
+		if (!client2.Update()) {return 1;}      //Update
+		if (!server.Update()) {return 1;}       //Update
 	}
 
 	instance1.CleanUp();    //Clean up all dynamically allocated memory

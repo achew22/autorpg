@@ -25,20 +25,21 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Character.h"
 
 #include <string>
-#include <list>
+#include <queue>
 #include <map>
 
 class Event_Manager
 {
 private:
-    std::list<Event*> eventList;
+    std::queue<Event*> eventQueue;
     std::map<int, Character*>* characterMap;    //This is only a pointer to a character map because it needs to use an up-to-the-ms
         //version when Polling events. Thus, the pointer.
 public:
     Event_Manager(std::map<int, Character*>* pCharacterMap);
+    ~Event_Manager();
     void AddEvent(std::string eventSerial);
 	void AddEvent(Event* event);
-	void PollEvent();
+	bool PollEvent();
 };
 
 #endif

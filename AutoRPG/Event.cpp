@@ -51,8 +51,18 @@ std::string Event::Serialize(Event* event)
 	return serial;
 }
 
+std::string Event::Serialize(int eventType, int eventWho_id, std::string eventInfo)
+{
+    std::string serial = "";
+    serial += Conversions::IntToString(eventType) + " ";
+    serial += Conversions::IntToString(eventWho_id) + "\n";
+    serial += eventInfo;
+    return serial;
+}
+
+//Note: Whenever this function is called, it dynamically allocates memory, and that memory must be deleted
 //The event looks like this:
-//"priority eventType who_id"
+//"eventType who_id"
 //"Info1 info2 info3 ...."
 Event* Event::Deserialize(std::string eventSerial)
 {
@@ -64,6 +74,7 @@ Event* Event::Deserialize(std::string eventSerial)
 	event->type = Conversions::StringToInt(temp);
 	inStream >> temp;
 	event->who_id = Conversions::StringToInt(temp);
+	inStream.get();
 	getline(inStream, event->info);
 	return event;
 }

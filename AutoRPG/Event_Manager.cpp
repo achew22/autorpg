@@ -31,53 +31,130 @@ Event_Manager::Event_Manager(std::map<int, Character*>* pCharacterMap)
     characterMap = pCharacterMap;
 }
 
+Event_Manager::~Event_Manager()
+{
+    while (!eventQueue.empty())
+    {
+        delete eventQueue.front();
+        eventQueue.pop();
+    }
+}
+
+//Use this version of the AddEvent function, it is safer from a memory perspective
 void Event_Manager::AddEvent(std::string eventSerial)
 {
-	eventList.push_back(Event::Deserialize(eventSerial));
+	eventQueue.push(Event::Deserialize(eventSerial));
 }
 
+//This function is not safe, please avoid using it
 void Event_Manager::AddEvent(Event* event)
 {
-	eventList.push_back(event);
+	eventQueue.push(event);
 }
 
-void Event_Manager::PollEvent()
+//Process the next event in the queue. Returns false if there are no events to poll.
+bool Event_Manager::PollEvent()
 {
-	Event* event = *eventList.begin();
-	eventList.erase(eventList.begin());
+    if (eventQueue.empty())
+    {
+        return false;
+    }
+	Event* event = eventQueue.front();
+	eventQueue.pop();
+
+	//This is necessary, so that if a character is searched for, but they don't exist, we don't segfault
+	std::map<int, Character*>::iterator whoIter = characterMap->find(event->who_id);
+	if (whoIter == characterMap->end())
+	{
+	    if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+	    {
+            printf("Polled an event for a character that does not exist - Character id %i\n", event->who_id);
+	    }
+	    delete event;
+	    return true;
+	}
+
 	switch (event->type)
 	{
-	case ATTACK:
-//		characterMap->find(who_id)->second->Attack(info);	//These are all special functions that take in serialized data, then deserialize it and
-        printf("Character with id %i Attacked!\n", event->who_id);
+	case EVENT_TYPE_ATTACK:
+//		whoIter->second->Attack(event->info);	//These are all special functions that take in serialized data, then deserialize it and
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Attacked!\n", event->who_id);
+        }
 		break;
-	case DEFEND:
-//		characterMap->find(who_id)->second->Defend(info);
-        printf("Character with id %i Defended!\n", event->who_id);
+	case EVENT_TYPE_DEFEND:
+//		whoIter->second->Defend(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Defended!\n", event->who_id);
+        }
 		break;
-	case TAKEDAMAGE:
-//		characterMap->find(who_id)->second->TakeDamage(info);
-        printf("Character with id %i Took Damage!\n", event->who_id);
+	case EVENT_TYPE_TAKEDAMAGE:
+//		whoIter->second->TakeDamage(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Took Damage!\n", event->who_id);
+        }
 		break;
-	case DEATH:
-//		characterMap->find(who_id)->second->Death(info);
-        printf("Character with id %i Died!\n", event->who_id);
+	case EVENT_TYPE_DEATH:
+//		whoIter->second->Death(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Died!\n", event->who_id);
+        }
 		break;
-	case SPAWN:
-//		characterMap.insert(characterMap.begin(), std::pair<std::string, Character*>(event->who_id, info));
-        printf("Character with id %i Spawned!\n", event->who_id);
+	case EVENT_TYPE_SPAWN:
+//		characterMap.insert(characterMap.begin(), std::pair<std::string, Character*>(event->who_id, event->info));
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Spawned!\n", event->who_id);
+        }
 		break;
-	case MOVEMENT:
-//		characterMap->find(who_id)->second->Movement(info);
-        printf("Character with id %i Moved!\n", event->who_id);
+    case EVENT_TYPE_JUMP:
+        whoIter->second->Jump(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Jumped!\n", event->who_id);
+        }
+        break;
+    case EVENT_TYPE_STOPJUMP:
+        whoIter->second->StopJump(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i stopped jumping!\n", event->who_id);
+        }
+        break;
+	case EVENT_TYPE_MOVE:
+		whoIter->second->Move(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Moved!\n", event->who_id);
+        }
 		break;
-	case CHAT:
-//		characterMap->find(who_id)->second->Chat(info);
-        printf("Character with id %i Chatted!\n", event->who_id);
+    case EVENT_TYPE_STOPMOVE:
+        whoIter->second->StopMove(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Stopped Moving!\n", event->who_id);
+        }
+        break;
+	case EVENT_TYPE_CHAT:
+//		whoIter->second->Chat(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Chatted!\n", event->who_id);
+        }
 		break;
 	default:
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS || DEBUG_SHOWERRORS)
+        {
+            printf("The event type is unknown - type is %i\n", event->type);
+        }
 		break;
 	}
 
 	delete event;	//This should be the only remaining pointer to this event, and it is deleted here to avoid memory leaks
+
+	return true;
 }

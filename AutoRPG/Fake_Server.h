@@ -29,6 +29,8 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <map>
 #include <string>
 
+class Client;
+
 //Returns everything as a string, since everything ought to be serialized. This means that it
 //will have to go through the parser before it can be used.
 class Fake_Server
@@ -36,12 +38,16 @@ class Fake_Server
 private:
     World* world;
     Event_Manager* eventManager;
+	std::map<int, Client*> clientMap;	//Contains the ids of all of the registered clients
     std::map<int, Quest*> questMap;
 public:
     Fake_Server(std::string filename);
+    ~Fake_Server();
+    bool Update();
     Quest* GetQuest(int id);
-    void InEvent(std::string event);
-    std::string RegisterClient(int clientId, int characterId);
+    void RegisterEvent(std::string event, int clientId);
+	void SendEventToClient(int clientId, std::string event);
+    std::string RegisterClient(Client* theClient, int characterId);
 };
 
 #endif

@@ -19,6 +19,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "Animation.h"
+
 #include <vector>
 #include <SDL/SDL.h>
 #include <math.h>

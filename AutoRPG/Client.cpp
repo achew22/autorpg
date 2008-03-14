@@ -22,17 +22,73 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 #include <string>
 #include <sstream>
+#include <SDL/SDL.h>
 
 Client::Client(Fake_Server* theServer, int clientId)
 {
     id = clientId;
     server = theServer;
     eventManager = new Event_Manager(&characterMap);
+    player = NULL;
+
+    moveUp = SDLK_UP;
+    moveDown = SDLK_DOWN;
+    moveLeft = SDLK_LEFT;
+    moveRight = SDLK_RIGHT;
 }
 
-void Client::Connect(int characterId)
+Client::~Client()
 {
-    std::string setupString = server->RegisterClient(id, characterId);
+    delete eventManager;
+}
+
+bool Client::Update()
+{
+    std::string event = player->PollEvent();
+
+    //First, send all of the events that the character did to the server
+    while (event != "NULL")
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Client %i sent an event with string '%s' to the server!\n", id, event.c_str());
+        }
+        SendEventToServer(event);
+        event = player->PollEvent();
+    }
+
+    //Now process all of the events that the server sent to the client
+    while (PollEvent())
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Client %i is polling an event that occurred\n", id);
+        }
+    }
+    return true;
+}
+
+void Client::SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight)
+{
+    moveUp = keyUp;
+    moveDown = keyDown;
+    moveLeft = keyLeft;
+    moveRight = keyRight;
+}
+
+int Client::GetId()
+{
+	return id;
+}
+
+//Attempt to connect to the server and take control of the character with id characterId
+bool Client::Connect(int characterId)
+{
+    std::string setupString = server->RegisterClient(this, characterId);
+    if (setupString == "FAILED")
+    {
+        return false;
+    }
     std::stringstream setupStream;
     setupStream.str(setupString);
     std::string line = "";
@@ -43,10 +99,79 @@ void Client::Connect(int characterId)
         characterMap.insert(std::pair<int, Character*>(tempChar->GetId(), tempChar));
         getline(setupStream, line);
     }
+    player = characterMap.find(characterId)->second;
+    return true;
 }
 
-void Client::InEvent(Event* event)
+void Client::RegisterEvent(std::string event)
 {
-    eventManager->AddEvent(event);
-    server->InEvent(Event::Serialize(event));
+	eventManager->AddEvent(event);
 }
+
+void Client::SendEventToServer(std::string event)
+{
+    server->RegisterEvent(event, id);
+}
+
+bool Client::PollEvent()
+{
+    return eventManager->PollEvent();
+}
+
+void Client::HandleInput(SDL_Event SDLEvent)
+{
+    if (SDLEvent.type == SDL_KEYDOWN)
+    {
+        SDLKey keyPressed = SDLEvent.key.keysym.sym;
+        if (keyPressed == moveRight)    //Right button pressed
+        {
+            player->MoveRight();
+        }
+        else if (keyPressed == moveLeft)    //Left button pressed
+        {
+            player->MoveLeft();
+        }
+        else if (keyPressed == moveDown)    //Down button pressed
+        {
+            player->MoveDown();
+        }
+        else if (keyPressed == moveUp)    //Up button pressed
+        {
+            player->MoveUp();
+        }
+    }
+    else if (SDLEvent.type == SDL_KEYUP)
+    {
+        SDLKey keyUp = SDLEvent.key.keysym.sym;
+        if (keyUp == moveRight)    //Right button released
+        {
+            if (player->GetVelocity().x > 0)   //If you were moving right
+            {
+                player->StopMoveHoriz();    //Stop moving right
+            }
+        }
+        else if (keyUp == moveLeft)     //Left button released
+        {
+            if (player->GetVelocity().x < 0)   //If you were moving left
+            {
+                player->StopMoveHoriz();    //Stop moving left
+            }
+        }
+        else if (keyUp == moveUp)     //Up button released
+        {
+            if (player->GetVelocity().y < 0)   //If you were moving up
+            {
+                player->StopMoveVert();    //Stop moving up
+            }
+        }
+        else if (keyUp == moveDown) //Down button released
+        {
+            if (player->GetVelocity().y > 0) //If you were moving down
+            {
+                player->StopMoveVert();  //Stop moving down
+            }
+        }
+    }
+}
+
+

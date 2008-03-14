@@ -22,6 +22,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Instance.h"
 #include "Graphics.h"
 #include "Conversions.h"
+#include "Event.h"
 
 #include <sstream>
 
@@ -41,6 +42,7 @@ Character::Character(int locx, int locy, int width, int height, SDL_Surface *des
 	vel.y = 0;
 
 	id = ID;
+	clientId = -1;  //This means that no client is yet assigned
 
 	destination = destinationSurface;
 	lastTime = SDL_GetTicks();
@@ -144,6 +146,7 @@ Character::Character(std::string serialized)
 
     inString >> temp;
 	id = Conversions::StringToInt(temp);
+	clientId = -1;  //No client yet assigned
 
 	destination = NULL;
 	lastTime = SDL_GetTicks();
@@ -227,19 +230,25 @@ void Character::AddAnimation(std::vector<int> animation, std::string filename)
     animList.push_back(Animation(filename, 48, 64, animation, 120, 255, 0, 0));
 }
 
+//Switch to a new animation
 void Character::ChangeAnimation(Animation* animation)
 {
     currentAnim = animation;
     currentAnim->Begin();
 }
 
+//Updates everything about the character that isn't the animation, ie does not blit the image to the screen or worry about
+//what animation it ought to be on. Used primarily for the server
 void Character::UpdatePosition()
 {
     double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
     fpsFrames++;
-    if (SDL_GetTicks() - fpsTicks > 1000)
+    if (SDL_GetTicks() - fpsTicks > 1000 && (DEBUG_SHOWALL && DEBUG_SHOWFPS))
     {
-        printf("Frames per second is %f\n", fpsFrames/((SDL_GetTicks() - fpsTicks)/1000.0));
+        if (DEBUG_SHOWALL || DEBUG_SHOWFPS)
+        {
+            printf("Frames per second is %f\n", fpsFrames/((SDL_GetTicks() - fpsTicks)/1000.0));
+        }
         fpsTicks = SDL_GetTicks();
         fpsFrames = 0;
     }
@@ -267,11 +276,24 @@ void Character::UpdatePosition()
 	lastTime = SDL_GetTicks();  //Update the last time
 }
 
+//Call only when the character is going to be drawn to the screen, that's all this does
 void Character::UpdateAnimation()
 {
     currentAnim->ApplyCurrentSprite(pos.x, pos.y, destination);
 
 	lastTime = SDL_GetTicks();  //Update the lastTime function
+}
+
+//Returns the next serialized event, or "NULL" if there are no events
+std::string Character::PollEvent()
+{
+    if (eventQueue.empty())
+    {
+        return "NULL";
+    }
+    std::string toReturn = eventQueue.front();
+    eventQueue.pop();
+    return toReturn;
 }
 
 Point Character::GetPosition()
@@ -284,11 +306,23 @@ int Character::GetId()
     return id;
 }
 
+int Character::GetClientId()
+{
+	return clientId;
+}
+
 void Character::AssignClient(int theClientId)
 {
     clientId = theClientId;
 }
 
+//The parameter info can be anything, it is disregarded here
+void Character::Jump(std::string info)
+{
+    Jump();
+}
+
+//Cause the character to Jump, which currently is deprecated
 void Character::Jump()
 {
     if (flagList[FLAG_JUMPING] == 0)    //If not already jumping
@@ -314,8 +348,17 @@ void Character::Jump()
         vel.y = -400;
         flagList[FLAG_JUMPING] = 1;
     }
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_JUMP, id, "NULL"));
 }
 
+//Here the parameter info is useless, could be anything
+void Character::StopJump(std::string info)
+{
+    StopJump();
+}
+
+//Cease jumping
 void Character::StopJump()
 {
     if (vel.x < 0)  //If moving left
@@ -357,6 +400,33 @@ void Character::StopJump()
     flagList[FLAG_JUMPING] = 0;
 }
 
+//info here is of a number corresponding to a constant with the prefix "EVENT_MOVE_INFO_*"
+void Character::Move(std::string info)
+{
+    int infoInt = Conversions::StringToInt(info);
+    switch (infoInt)
+    {
+    case EVENT_MOVE_INFO_UP:
+        MoveUp();
+        break;
+    case EVENT_MOVE_INFO_DOWN:
+        MoveDown();
+        break;
+    case EVENT_MOVE_INFO_LEFT:
+        MoveLeft();
+        break;
+    case EVENT_MOVE_INFO_RIGHT:
+        MoveRight();
+        break;
+    default:
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("An error occurred: Move -- the info parameter - %s - is not a proper format\n", info.c_str());
+        }
+        break;
+    }
+}
+
 void Character::MoveLeft()
 {
     if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
@@ -369,6 +439,8 @@ void Character::MoveLeft()
     }
     flagList[FLAG_FACING] = 1;
     vel.x = -80;   //800 pixels per second, give or take
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_LEFT)));
 }
 
 void Character::MoveRight()
@@ -383,6 +455,8 @@ void Character::MoveRight()
     }
     flagList[FLAG_FACING] = 2;
     vel.x = 80;    //800 pixels per second, give or take
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_RIGHT)));
 }
 
 void Character::MoveUp()
@@ -390,6 +464,8 @@ void Character::MoveUp()
     ChangeAnimation(&animList[ANIM_MOVEUP]);
     flagList[FLAG_FACING] = 3;
     vel.y = -80;
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_UP)));
 }
 
 void Character::MoveDown()
@@ -397,6 +473,28 @@ void Character::MoveDown()
     ChangeAnimation(&animList[ANIM_MOVEDOWN]);
     flagList[FLAG_FACING] = 4;
     vel.y = 80;
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_DOWN)));
+}
+
+void Character::StopMove(std::string info)
+{
+    int infoInt = Conversions::StringToInt(info);
+    switch (infoInt)
+    {
+    case EVENT_STOPMOVE_INFO_HORIZ:
+        StopMoveHoriz();
+        break;
+    case EVENT_STOPMOVE_INFO_VERT:
+        StopMoveVert();
+        break;
+    default:
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("An error occurred: StopMove -- the info string - %s - is not of the proper format\n", info.c_str());
+        }
+        break;
+    }
 }
 
 void Character::StopMoveHoriz()
@@ -420,6 +518,8 @@ void Character::StopMoveHoriz()
         ChangeAnimation(&animList[ANIM_STILLRIGHT]);
     }
     vel.x = 0;
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_STOPMOVE, id, Conversions::IntToString(EVENT_STOPMOVE_INFO_HORIZ)));
 }
 
 void Character::StopMoveVert()
@@ -443,6 +543,8 @@ void Character::StopMoveVert()
         ChangeAnimation(&animList[ANIM_STILLDOWN]);
     }
     vel.y = 0;
+
+    eventQueue.push(Event::Serialize(EVENT_TYPE_STOPMOVE, id, Conversions::IntToString(EVENT_STOPMOVE_INFO_VERT)));
 }
 
 Point Character::GetVelocity()

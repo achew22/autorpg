@@ -25,9 +25,12 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Character.h"
 #include "Sector.h"
 #include "Event.h"
+#include "Area.h"
 #include "Fake_Server.h"
 
+#include <SDL/SDL.h>
 #include <map>
+#include <string>
 #include <vector>
 
 class Client
@@ -36,12 +39,25 @@ private:
     int id;
     Event_Manager* eventManager;
     std::map<int, Character*> characterMap;
-    //std::vector<Sector*> sectorArray;
     Fake_Server* server;
+    Character* player;
+
+    //Key mappings
+    SDLKey moveUp;
+    SDLKey moveDown;
+    SDLKey moveLeft;
+    SDLKey moveRight;
 public:
     Client(Fake_Server* theServer, int clientId);
-    void Connect(int characterId);
-    void InEvent(Event* event);
+    ~Client();
+    bool Update();
+    void SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight);
+	int GetId();
+    bool Connect(int characterId);  //Connects to the server using character with id characterId
+	void RegisterEvent(std::string event);  //Let the Client know that an event has occurred
+	void SendEventToServer(std::string event);  //Send a serialized event to server - often occurs in tandem with the function above
+    bool PollEvent();   //Process the next event in eventManager. Returns false if there are no more events to poll
+    void HandleInput(SDL_Event SDLEvent);   //Handle the input from SDL, such as keypresses and mouse clicks
 };
 
 #endif

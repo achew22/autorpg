@@ -21,6 +21,8 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Sprite_Sheet.h"
 #include "constants.h"
 #include "Point.h"
+#include "Graphics.h"
+
 #include <string>
 #include <stdio.h>
 #include <SDL/SDL.h>
@@ -35,6 +37,7 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
     //Loads the file to the surface screen, with the alphamask indicated by red, green, and blue
     SDL_Surface *loadedImage = NULL;
 	SDL_Surface *sheet = NULL;
+
 	loadedImage = IMG_Load(filename.c_str());
 	if (loadedImage != NULL)
 	{
@@ -42,7 +45,7 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
 		SDL_FreeSurface(loadedImage);   //Free this memory
 	}
 
-    if (sheet == NULL)
+    if (sheet == NULL && (DEBUG_SHOWALL || DEBUG_SHOWERRORS))
     {
         printf("Sheet is not initialized for some reason\n");
     }
@@ -75,8 +78,6 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
 
     spriteDim.x = wOfSprite;    //Set the spriteDimentions
     spriteDim.y = hOfSprite;
-    printf("wOfSprite is %i, hOfSprite is %i\n", wOfSprite, hOfSprite);
-    printf("spriteDim.x is %f, spriteDim.y is %f\n", spriteDim.x, spriteDim.y);
 
     SDL_FreeSurface(sheet); //Free this memory
 
@@ -99,7 +100,10 @@ void Sprite_Sheet::ApplySprite(int x, int y, int spriteNum, SDL_Surface* destina
 {
     if (spriteNum >= sprites.size() || spriteNum < 0)
     {
-        printf("ApplySprite had a sprite out of range\n");
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("ApplySprite had a sprite out of range\n");
+        }
         return;
     }
     SDL_Rect offset;

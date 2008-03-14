@@ -31,6 +31,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <map>
 #include <string>
 #include <vector>
+#include <queue>
 
 //The class for any and all characters in the game.
 class Character
@@ -45,7 +46,6 @@ private:
 
     int lastTime;   //The time (in ms) of the last time Update was called. Allows for the positions, etc. to be adjusted
         //independently of frame rate.
-	//SDL_Surface *source;	//A pointer to the surface containing the sprites
 	SDL_Surface *destination; //A pointer to the surface where the sprites should be blitted to
 	std::vector<Animation> animList;	//A list of the different possible animations
 	std::vector<int> flagList;	//A list of all of the flags
@@ -54,7 +54,10 @@ private:
     int currentSectorId;  //The current Sector
     int currentAreaId;  //The current Area
 
-    int clientId;
+    int clientId;   //-1 means no client is assigned
+
+    std::queue<std::string> eventQueue;  //Holds all of the events that this Character creates, so that they might be polled by
+        //the Client
 
 	double fpsTicks, fpsFrames; //Used for calculating framerate
 	enum
@@ -83,21 +86,33 @@ public:
 	Character(std::string serialized);
 	void AddAnimation(std::vector<int> animation, std::string filename = "images/miniDungeonCharSprites2x.png");
 	void ChangeAnimation(Animation* animation);
-    void UpdatePosition();  //Updates the position based on velocity and acceleration
+    void UpdatePosition();  //Updates everything but the animation
 	void UpdateAnimation();	//Updates the surface on which the character should be updated
+	std::string PollEvent();    //Get the first event in the event queue, returns "NULL" otherwise
     Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
 	Point GetVelocity();	//Returns the velocity
 	int GetId();    //Returns the id
+	int GetClientId();	//Returns the client id number
 	void AssignClient(int theClientId);
+
+	//Below are all of the functions corresponding to events. If a function is overloaded with the string
+	//parameter "info," that is the function that will be called when and event with type "EVENT_TYPE_FUNCTIONNAME"
+	//is polled
+	void Jump(std::string info);
 	void Jump();
+	void StopJump(std::string info);
 	void StopJump();
+	void Move(std::string info);
 	void MoveRight();
 	void MoveLeft();
 	void MoveUp();
 	void MoveDown();
+	void StopMove(std::string info);
 	void StopMoveHoriz();
 	void StopMoveVert();
+
+	//Serialize this character, for transport
 	std::string Serialize();
 };
 

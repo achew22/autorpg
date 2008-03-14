@@ -36,24 +36,38 @@ Fake_Server::Fake_Server(std::string filename)
     std::string line = "";
     getline(inFile, line);
     world = new World(line);
-    getline(inFile, line);
-    int locx = 0, locy = 0;
-    std::string temp = "";
     int i = 0;
-    while (line != "END_")
+    while (!inFile.eof())
     {
-        std::stringstream inString;
-        inString.str(line);
-        inString >> temp;
-        locx = Conversions::StringToInt(temp);
-        inString >> temp;
-        locy = Conversions::StringToInt(temp);
-        world->AddCharacter(new Character(locx, locy, CHARACTER_WIDTH, CHARACTER_HEIGHT, NULL, i));
-        i++;
         getline(inFile, line);
+        Character* newCharacter = new Character(line);
+        world->AddCharacter(newCharacter);
+        i++;
     }
     eventManager = new Event_Manager(world->GetCharacterMap());
     inFile.close();
+}
+
+Fake_Server::~Fake_Server()
+{
+    delete eventManager;
+    delete world;
+}
+
+bool Fake_Server::Update()
+{
+    //First perform all events
+    while (eventManager->PollEvent()) {}
+
+    //Now update the positions of all characters
+    for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
+    {
+        i->second->UpdatePosition();
+    }
+
+    //Maybe more should go here, but I'm not sure
+
+    return true;
 }
 
 Quest* Fake_Server::GetQuest(int id)
@@ -61,16 +75,59 @@ Quest* Fake_Server::GetQuest(int id)
     return questMap[id];
 }
 
-void Fake_Server::InEvent(std::string event)
+void Fake_Server::RegisterEvent(std::string event, int clientId)
 {
     eventManager->AddEvent(event);
-    //Here, it still needs to determine which clients (if any) to send this event to
+	Event* eventptr = Event::Deserialize(event);
+    if (eventptr->type < 100)	//Do not forward events whose type is greater than 100
+	{
+		//Currently, sends the event to every other player in the world. I will fix this when I get the chance
+		for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
+		{
+		    int tempId = 0;
+			if ( clientId != (tempId = i->second->GetClientId() ) && tempId != -1 )
+			{
+				SendEventToClient(tempId, event);
+			}
+		}
+	}
+
+	delete eventptr;    //Free this memory that was allocated
 }
 
-std::string Fake_Server::RegisterClient(int clientId, int characterId)
+void Fake_Server::SendEventToClient(int clientId, std::string event)
 {
-    world->GetCharacter(characterId)->AssignClient(clientId);
-    std::string toSend = "";
+    std::map<int, Client*>::iterator i = clientMap.find(clientId);
+    if (i != clientMap.end())
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Sending event from server to client. Event is '%s' and client has id %i\n", event.c_str(), clientId);
+        }
+        i->second->RegisterEvent(event);
+    }
+    else
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("An error occurred: Fake Server tried to send an event to client %i - doesn't exist\n", clientId);
+        }
+    }
+}
+
+std::string Fake_Server::RegisterClient(Client* theClient, int characterId)
+{
+    if (world->GetCharacter(characterId)->GetClientId() != -1)
+    {
+        return "FAILED";
+    }
+    world->GetCharacter(characterId)->AssignClient(theClient->GetId());
+
+	clientMap.insert(std::pair<int, Client*>(theClient->GetId(), theClient));
+
+    std::string toSend = "";	//toSend will contain all of the information that needs to be sent to the client:
+		//This includes the characters around the client, the area information, the map information, and maybe more
+	//Currently, this just sends info on all characters that exist at this point in time
     for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
     {
         toSend += i->second->Serialize() + "\n";

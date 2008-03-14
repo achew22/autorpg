@@ -23,6 +23,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 #include "constants.h"
 #include "Sprite_Sheet.h"
+
 #include <vector>
 #include <SDL/SDL.h>
 #include <string>

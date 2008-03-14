@@ -25,6 +25,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <stdio.h>
 
 World::World(std::string filename)
 {
@@ -32,14 +33,28 @@ World::World(std::string filename)
 
     std::ifstream fileIn(filename.c_str());
     std::string line = "";   //the current line
+    getline(fileIn, line);  //Should read "Areas:"
+    getline(fileIn, line);
 
     while (!fileIn.eof())
     {
-        getline(fileIn, line);
         areaVect.push_back(new Area(line));
+        getline(fileIn, line);
     }
 
     fileIn.close();
+}
+
+World::~World()
+{
+    for (std::map<int, Character*>::iterator i = characterMap.begin(); i != characterMap.end(); i++)
+    {
+        delete i->second;
+    }
+    for (int i = 0; i < areaVect.size(); i++)
+    {
+        delete areaVect[i];
+    }
 }
 
 void World::AddCharacter(Character* character)
@@ -55,11 +70,7 @@ void World::RemoveCharacter(int id)
 Character* World::GetCharacter(int id)
 {
     std::map<int, Character*>::iterator i = characterMap.find(id);
-    if (i != characterMap.end())
-    {
-        return (*i).second;
-    }
-    return NULL;
+    return i->second;
 }
 
 std::map<int, Character*>* World::GetCharacterMap()

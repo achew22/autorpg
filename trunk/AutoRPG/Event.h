@@ -34,6 +34,7 @@ public:
 	Event();
 	Event(int eventType, int eventWho_id, std::string eventInfo);
 	static std::string Serialize(Event* event);
+    static std::string Serialize(int eventType, int eventWho_id, std::string eventInfo);
 	static Event* Deserialize(std::string eventSerial);
 };
 

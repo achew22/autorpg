@@ -111,7 +111,7 @@ bool Client::Connect(int characterId)
     getline(setupStream, line); //Should read 'Map:'
     getline(setupStream, mapfile); //Should read 'mapfile.txt'
     getline(setupStream, picfile); //Should read 'picturefile.png'
-    map->LoadFiles(mapfile, picfile);
+    map = new Map(mapfile, picfile);
     getline(setupStream, line); //Shoud read 'Characters:'
     getline(setupStream, line); //Should be the serialized version of the first character
     while (line != "END_")

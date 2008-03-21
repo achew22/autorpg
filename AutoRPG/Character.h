@@ -51,8 +51,8 @@ private:
 	std::vector<int> flagList;	//A list of all of the flags
     Animation* currentAnim; //A pointer to the current animation being used
 
-    int currentSectorId;  //The current Sector
-    int currentAreaId;  //The current Area
+    int currentSectorId;    //The current Sector
+    int currentAreaId;      //The current Area
 
     int clientId;   //-1 means no client is assigned
 
@@ -82,7 +82,7 @@ private:
 		ANIM_STILLDOWN,     //standing still, facing down
 	};
 public:
-	Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID);
+	Character(int areaId, int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID);
 	Character(std::string serialized);
 	void AddAnimation(std::vector<int> animation, std::string filename = "images/miniDungeonCharSprites2x.png");
 	void ChangeAnimation(Animation* animation);
@@ -94,6 +94,7 @@ public:
 	Point GetVelocity();	//Returns the velocity
 	int GetId();    //Returns the id
 	int GetClientId();	//Returns the client id number
+	int GetAreaId();    //Returns the area id
 	void AssignClient(int theClientId);
 
 	//Below are all of the functions corresponding to events. If a function is overloaded with the string

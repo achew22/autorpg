@@ -113,7 +113,7 @@ bool Instance::Update()
 
 void Instance::SetUpDynamicObjects()
 {
-	player = new Character(20, 32, 48, 64, dynamicLayer, 1);
+	player = new Character(0, 20, 32, 48, 64, dynamicLayer, 1);
 	characterMap.insert(std::pair<int, Character*>(1, player));
 }
 

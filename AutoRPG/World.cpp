@@ -38,7 +38,8 @@ World::World(std::string filename)
 
     while (!fileIn.eof())
     {
-        areaVect.push_back(new Area(line));
+        Area* tempArea = new Area(line);
+        areaMap.insert(std::pair<int, Area*>(tempArea->GetId(), tempArea));
         getline(fileIn, line);
     }
 
@@ -51,9 +52,9 @@ World::~World()
     {
         delete i->second;
     }
-    for (int i = 0; i < areaVect.size(); i++)
+    for (std::map<int, Area*>::iterator i = areaMap.begin(); i != areaMap.end(); i++)
     {
-        delete areaVect[i];
+        delete i->second;
     }
 }
 
@@ -70,10 +71,30 @@ void World::RemoveCharacter(int id)
 Character* World::GetCharacter(int id)
 {
     std::map<int, Character*>::iterator i = characterMap.find(id);
-    return i->second;
+    if (i != characterMap.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 std::map<int, Character*>* World::GetCharacterMap()
 {
     return &characterMap;
+}
+
+Area* World::GetArea(int id)
+{
+    std::map<int, Area*>::iterator i = areaMap.find(id);
+    if (i != areaMap.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return NULL;
+    }
 }

@@ -36,12 +36,15 @@ class Area
 {
 private:
     std::string name;
+    int id;
     Point dim;
     std::map<int, Character*> characterMap;
     Map* map;
     std::vector< std::vector<Sector*> > sectorVect;
 public:
     Area(std::string filename);
+    std::string GetMapInfo();
+    int GetId();
 };
 
 #endif

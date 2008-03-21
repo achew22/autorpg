@@ -19,6 +19,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "Area.h"
+#include "Conversions.h"
 
 #include <vector>
 #include <string>
@@ -32,6 +33,9 @@ Area::Area(std::string filename)
     std::string line = "";
     getline(inStream, line);    //Should read "Name:", we can check if we want, but I don't think at this stage that it is necessary
     getline(inStream, name);
+    getline(inStream, line);    //Should read "Id:"
+    getline(inStream, line);
+    id = Conversions::StringToInt(line);
     getline(inStream, line);    //Should read "Map:"
     getline(inStream, line);
 
@@ -40,5 +44,14 @@ Area::Area(std::string filename)
     std::string mapFile1 = "", mapFile2 = "";
     inString >> mapFile1 >> mapFile2;
     map = new Map(mapFile1, mapFile2);
+}
 
+std::string Area::GetMapInfo()
+{
+    return map->GetMapInfo();
+}
+
+int Area::GetId()
+{
+    return id;
 }

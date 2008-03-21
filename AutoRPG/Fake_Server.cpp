@@ -117,6 +117,10 @@ void Fake_Server::SendEventToClient(int clientId, std::string event)
 
 std::string Fake_Server::RegisterClient(Client* theClient, int characterId)
 {
+    if (world->GetCharacter(characterId) == NULL)
+    {
+        return "FAILED";
+    }
     if (world->GetCharacter(characterId)->GetClientId() != -1)
     {
         return "FAILED";
@@ -128,6 +132,21 @@ std::string Fake_Server::RegisterClient(Client* theClient, int characterId)
     std::string toSend = "";	//toSend will contain all of the information that needs to be sent to the client:
 		//This includes the characters around the client, the area information, the map information, and maybe more
 	//Currently, this just sends info on all characters that exist at this point in time
+	toSend += "Map:\n";
+	if (world->GetArea(world->GetCharacter(characterId)->GetAreaId()) != NULL)
+	{
+	    toSend += world->GetArea(world->GetCharacter(characterId)->GetAreaId())->GetMapInfo();
+	}
+	else
+	{
+	    if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+	    {
+	        printf("There was an error, tried to access an area whose id did not exist. Id was %i\n", world->GetCharacter(characterId)->GetAreaId());
+	    }
+	    toSend += "Error\nError";
+	}
+	toSend += "\n";
+	toSend += "Characters:\n";
     for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
     {
         toSend += i->second->Serialize() + "\n";

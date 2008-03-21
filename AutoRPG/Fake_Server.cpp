@@ -79,7 +79,7 @@ void Fake_Server::RegisterEvent(std::string event, int clientId)
 {
     eventManager->AddEvent(event);
 	Event* eventptr = Event::Deserialize(event);
-    if (eventptr->type < 100)	//Do not forward events whose type is greater than 100
+    if (eventptr->ShouldForward())	//Do not forward events if they should not go from the server to the client
 	{
 		//Currently, sends the event to every other player in the world. I will fix this when I get the chance
 		for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)

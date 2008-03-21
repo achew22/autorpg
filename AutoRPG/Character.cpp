@@ -243,7 +243,7 @@ void Character::UpdatePosition()
 {
     double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
     fpsFrames++;
-    if (SDL_GetTicks() - fpsTicks > 1000 && (DEBUG_SHOWALL && DEBUG_SHOWFPS))
+    if (SDL_GetTicks() - fpsTicks > 1000)
     {
         if (DEBUG_SHOWALL || DEBUG_SHOWFPS)
         {
@@ -319,11 +319,12 @@ void Character::AssignClient(int theClientId)
 //The parameter info can be anything, it is disregarded here
 void Character::Jump(std::string info)
 {
-    Jump();
+    Jump(false);
 }
 
 //Cause the character to Jump, which currently is deprecated
-void Character::Jump()
+//If addEvent is true (it is by default), then this event will be added to the event Queue
+void Character::Jump(bool addEvent /*=true*/)
 {
     if (flagList[FLAG_JUMPING] == 0)    //If not already jumping
     {
@@ -349,17 +350,20 @@ void Character::Jump()
         flagList[FLAG_JUMPING] = 1;
     }
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_JUMP, id, "NULL"));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Jump", id, "NULL"));
+    }
 }
 
 //Here the parameter info is useless, could be anything
 void Character::StopJump(std::string info)
 {
-    StopJump();
+    StopJump(false);
 }
 
-//Cease jumping
-void Character::StopJump()
+//Cease jumping. If addEvent is true (it is by default), this event will be added to the eventQueue
+void Character::StopJump(bool addEvent /*=true*/)
 {
     if (vel.x < 0)  //If moving left
     {
@@ -398,36 +402,86 @@ void Character::StopJump()
     }
     vel.y = 0;
     flagList[FLAG_JUMPING] = 0;
-}
 
-//info here is of a number corresponding to a constant with the prefix "EVENT_MOVE_INFO_*"
-void Character::Move(std::string info)
-{
-    int infoInt = Conversions::StringToInt(info);
-    switch (infoInt)
+    if (addEvent)
     {
-    case EVENT_MOVE_INFO_UP:
-        MoveUp();
-        break;
-    case EVENT_MOVE_INFO_DOWN:
-        MoveDown();
-        break;
-    case EVENT_MOVE_INFO_LEFT:
-        MoveLeft();
-        break;
-    case EVENT_MOVE_INFO_RIGHT:
-        MoveRight();
-        break;
-    default:
-        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
-        {
-            printf("An error occurred: Move -- the info parameter - %s - is not a proper format\n", info.c_str());
-        }
-        break;
+        eventQueue.push(Event::Serialize("StopJump", id, "NULL"));
     }
 }
 
-void Character::MoveLeft()
+//Info here looks like the following:
+//"Direction: direc xPos: x yPos: y"
+void Character::Move(std::string info)
+{
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("Character %i was told to move via an event. Character is now at position ", id);
+    }
+    std::stringstream inStream;
+    inStream.str(info);
+    std::string inString;
+    inStream >> inString;   //Pull in 'Direction:'
+    inStream >> inString;   //Pull in 'direc'
+    std::string direc = inString;
+    inStream >> inString;   //Pull in 'xPos:'
+    inStream >> inString;   //Pull in 'x'
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("%s, ", inString.c_str());
+    }
+    pos.x = Conversions::StringToInt(inString);
+    inStream >> inString;   //Pull in 'yPos:'
+    inStream >> inString;   //Pull in 'y'
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("%s. Movement is in the ", inString.c_str());
+    }
+    pos.y = Conversions::StringToInt(inString);
+
+    //Handle which direction to move
+    if (direc == "Up")
+    {
+        MoveUp(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Up direction.\n\n");
+        }
+    }
+    else if (direc == "Down")
+    {
+        MoveDown(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Down direction.\n\n");
+        }
+    }
+    else if (direc == "Left")
+    {
+        MoveLeft(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Left direction.\n\n");
+        }
+    }
+    else if (direc == "Right")
+    {
+        MoveRight(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Right direction.\n\n");
+        }
+    }
+    else
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("\n--------An error occurred: Move -- the info parameter - %s - is not a proper format\n\n", info.c_str());
+        }
+    }
+}
+
+//Moves the character left. If addEvent is true (it is by default), an event showing that this character moved left will be added to the eventQueue.
+void Character::MoveLeft(bool addEvent /*=true*/)
 {
     if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
     {
@@ -440,10 +494,14 @@ void Character::MoveLeft()
     flagList[FLAG_FACING] = 1;
     vel.x = -80;   //800 pixels per second, give or take
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_LEFT)));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Move", id, "Direction: Left xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+    }
 }
 
-void Character::MoveRight()
+//If addEvent is true (it is by default) this will be added to the eventQueue as well
+void Character::MoveRight(bool addEvent /*=true*/)
 {
     if (flagList[FLAG_JUMPING] == 1)    //If you are jumping
     {
@@ -456,48 +514,93 @@ void Character::MoveRight()
     flagList[FLAG_FACING] = 2;
     vel.x = 80;    //800 pixels per second, give or take
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_RIGHT)));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Move", id, "Direction: Right xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+    }
 }
 
-void Character::MoveUp()
+//If addEvent is true (it is by default) this will be added to the eventQueue as well
+void Character::MoveUp(bool addEvent /*=true*/)
 {
     ChangeAnimation(&animList[ANIM_MOVEUP]);
     flagList[FLAG_FACING] = 3;
     vel.y = -80;
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_UP)));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Move", id, "Direction: Up xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+    }
 }
 
-void Character::MoveDown()
+//If addEvent is true (it is by default) this will be added to the eventQueue as well
+void Character::MoveDown(bool addEvent /*=true*/)
 {
     ChangeAnimation(&animList[ANIM_MOVEDOWN]);
     flagList[FLAG_FACING] = 4;
     vel.y = 80;
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_MOVE, id, Conversions::IntToString(EVENT_MOVE_INFO_DOWN)));
-}
-
-void Character::StopMove(std::string info)
-{
-    int infoInt = Conversions::StringToInt(info);
-    switch (infoInt)
+    if (addEvent)
     {
-    case EVENT_STOPMOVE_INFO_HORIZ:
-        StopMoveHoriz();
-        break;
-    case EVENT_STOPMOVE_INFO_VERT:
-        StopMoveVert();
-        break;
-    default:
-        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
-        {
-            printf("An error occurred: StopMove -- the info string - %s - is not of the proper format\n", info.c_str());
-        }
-        break;
+        eventQueue.push(Event::Serialize("Move", id, "Direction: Down xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
 }
 
-void Character::StopMoveHoriz()
+//info should be of the following form: "Direction: direc xPos: x yPos: y"
+void Character::StopMove(std::string info)
+{
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("Character %i was told to stop moving via an event. Character is now at position ", id);
+    }
+    std::stringstream inStream;
+    inStream.str(info);
+    std::string inString;
+    inStream >> inString;   //Pull in 'Direction:'
+    inStream >> inString;   //Pull in 'direc'
+    std::string direc = inString;
+    inStream >> inString;   //Pull in 'xPos:'
+    inStream >> inString;   //Pull in 'x'
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("%s, ", inString.c_str());
+    }
+    pos.x = Conversions::StringToInt(inString);
+    inStream >> inString;   //Pull in 'yPos:'
+    inStream >> inString;   //Pull in 'y'
+    if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+    {
+        printf("%s. Movement is in the ", inString.c_str());
+    }
+    pos.y = Conversions::StringToInt(inString);
+
+    if (direc == "Horiz")
+    {
+        StopMoveHoriz(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Horizontal direction.\n\n");
+        }
+    }
+    else if (direc == "Vert")
+    {
+        StopMoveVert(false);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Vertical direction.\n\n");
+        }
+    }
+    else
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("\n----------An error occurred: StopMove -- the info string - %s - is not of the proper format\n\n", info.c_str());
+        }
+    }
+}
+
+//if addEvent is true (it is by default), this event will be added to eventQueue
+void Character::StopMoveHoriz(bool addEvent /*=true*/)
 {
     if (vel.y < 0)  //If moving up
     {
@@ -519,10 +622,14 @@ void Character::StopMoveHoriz()
     }
     vel.x = 0;
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_STOPMOVE, id, Conversions::IntToString(EVENT_STOPMOVE_INFO_HORIZ)));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("StopMove", id, "Direction: Horiz xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+    }
 }
 
-void Character::StopMoveVert()
+//If addEvent is true (it is by default), this event will be added to the eventQueue
+void Character::StopMoveVert(bool addEvent /*=true*/)
 {
     if (vel.x < 0)  //If moving left
     {
@@ -544,7 +651,10 @@ void Character::StopMoveVert()
     }
     vel.y = 0;
 
-    eventQueue.push(Event::Serialize(EVENT_TYPE_STOPMOVE, id, Conversions::IntToString(EVENT_STOPMOVE_INFO_VERT)));
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("StopMove", id,"Direction: Vert xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+    }
 }
 
 Point Character::GetVelocity()

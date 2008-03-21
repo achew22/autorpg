@@ -82,6 +82,8 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
     SDL_FreeSurface(sheet); //Free this memory
 
     spriteSheetList.push_back(this);
+
+    numUsers = 1;   //We are assuming that this is being created for use by ONE class at this time. Use AddUser() to add more.
 }
 
 Sprite_Sheet::~Sprite_Sheet()
@@ -120,6 +122,23 @@ bool Sprite_Sheet::operator ==(Sprite_Sheet* compare)
 Point Sprite_Sheet::GetSpriteDimension()
 {
     return spriteDim;
+}
+
+//Used for memory management in conjunction with the function below
+void Sprite_Sheet::AddUser()
+{
+    numUsers++;
+}
+
+//This function is for memory management. This particular instance of spriteSheet will always
+//keep track of how many users are using it. If that number drops to zero, it deletes itself.
+void Sprite_Sheet::RemoveUser()
+{
+    numUsers--;
+    if (numUsers <= 0)
+    {
+        delete this;
+    }
 }
 
 Sprite_Sheet* Sprite_Sheet::FindSheet(std::string file)

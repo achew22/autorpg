@@ -42,13 +42,17 @@ private:
     Fake_Server* server;
     Character* player;
 
+    SDL_Surface* screen;
+    SDL_Surface* dynamicLayer;
+    Map* map;
+
     //Key mappings
     SDLKey moveUp;
     SDLKey moveDown;
     SDLKey moveLeft;
     SDLKey moveRight;
 public:
-    Client(Fake_Server* theServer, int clientId);
+    Client(Fake_Server* theServer, int clientId, SDL_Surface* theScreen);
     ~Client();
     bool Update();
     void SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight);

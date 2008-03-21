@@ -100,17 +100,17 @@ public:
 	//parameter "info," that is the function that will be called when and event with type "EVENT_TYPE_FUNCTIONNAME"
 	//is polled
 	void Jump(std::string info);
-	void Jump();
+	void Jump(bool addEvent = true);
 	void StopJump(std::string info);
-	void StopJump();
+	void StopJump(bool addEvent = true);
 	void Move(std::string info);
-	void MoveRight();
-	void MoveLeft();
-	void MoveUp();
-	void MoveDown();
+	void MoveRight(bool addEvent = true);
+	void MoveLeft(bool addEvent = true);
+	void MoveUp(bool addEvent = true);
+	void MoveDown(bool addEvent = true);
 	void StopMove(std::string info);
-	void StopMoveHoriz();
-	void StopMoveVert();
+	void StopMoveHoriz(bool addEvent = true);
+	void StopMoveVert(bool addEvent = true);
 
 	//Serialize this character, for transport
 	std::string Serialize();

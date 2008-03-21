@@ -31,10 +31,10 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 Map::Map(std::string mapFile, std::string pictureFile)
 {
-    std::ifstream fileIn(mapFile.c_str());
+    std::fstream fileIn(mapFile.c_str());
     std::string line = "";   //the current line
     getline(fileIn, line);
-    std::istringstream stringIn;
+    std::stringstream stringIn;
     stringIn.str(line);
     std::string temp = "";
     stringIn >> temp;
@@ -47,9 +47,9 @@ Map::Map(std::string mapFile, std::string pictureFile)
         getline(fileIn, line);
         line += " END__";
         std::string buffer = "";
-        std::istringstream stringIn;
+        std::stringstream stringIn;
         stringIn.str(line);
-        std::vector<int> tempLine;
+        std::vector<int> tempLine;  //Holds a line of indexes from the mapfile
         stringIn >> buffer;
         while (buffer != "END__")
         {
@@ -61,10 +61,77 @@ Map::Map(std::string mapFile, std::string pictureFile)
 
     fileIn.close();
 
-    spriteSheet = Sprite_Sheet::FindSheet(pictureFile);
+    spriteSheet = Sprite_Sheet::FindSheet(pictureFile); //First, attempt to find this spriteSheet if it has already been
+        //created in memory. If not, returns NULL
     if (spriteSheet == NULL)
     {
         spriteSheet = new Sprite_Sheet(spriteDim.x, spriteDim.y, pictureFile);
+    }
+    else
+    {
+        spriteSheet->AddUser(); //This function is for memory management. This particular instance of spriteSheet will always
+            //keep track of how many users are using it. If that number drops to zero, it removes itself.
+    }
+}
+
+Map::~Map()
+{
+    spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
+        //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+}
+
+void Map::LoadFiles(std::string mapFile, std::string pictureFile)
+{
+    //First, get rid of all of the stuff that was already created
+    spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
+        //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+    for (int i = 0; i < spriteIds.size(); i++)
+    {
+        spriteIds[i].resize(0); //Delete all of the current indexes
+    }
+    spriteIds.resize(0);
+
+    //Now load up the new files
+    std::fstream fileIn(mapFile.c_str());
+    std::string line = "";   //the current line
+    getline(fileIn, line);
+    std::stringstream stringIn;
+    stringIn.str(line);
+    std::string temp = "";
+    stringIn >> temp;
+    spriteDim.x = Conversions::StringToInt(temp);
+    stringIn >> temp;
+    spriteDim.y = Conversions::StringToInt(temp);
+
+    while (!fileIn.eof())
+    {
+        getline(fileIn, line);
+        line += " END__";   //So we know when to stop easily
+        std::string buffer = "";
+        std::stringstream stringIn;
+        stringIn.str(line);
+        std::vector<int> tempLine;  //Holds a line of indexes from the mapfile
+        stringIn >> buffer;
+        while (buffer != "END__")
+        {
+            tempLine.push_back(Conversions::StringToInt(buffer));
+            stringIn >> buffer;
+        }
+        spriteIds.push_back(tempLine);
+    }
+
+    fileIn.close();
+
+    spriteSheet = Sprite_Sheet::FindSheet(pictureFile); //First, attempt to find this spriteSheet if it has already been
+        //created in memory. If not, returns NULL
+    if (spriteSheet == NULL)
+    {
+        spriteSheet = new Sprite_Sheet(spriteDim.x, spriteDim.y, pictureFile);
+    }
+    else
+    {
+        spriteSheet->AddUser(); //This function is for memory management. This particular instance of spriteSheet will always
+            //keep track of how many users are using it. If that number drops to zero, it removes itself.
     }
 }
 
@@ -95,6 +162,7 @@ void Map::ApplyMap(int x, int y, int w, int h, SDL_Surface* destination)
     }
 }
 
+//Returns the dimensions of the map, in terms of how many sprites tall by how many sprites wide
 Point Map::GetDim()
 {
     return Point(spriteIds.size(), spriteIds[0].size());

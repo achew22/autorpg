@@ -74,85 +74,94 @@ bool Event_Manager::PollEvent()
 	    return true;
 	}
 
-	switch (event->type)
-	{
-	case EVENT_TYPE_ATTACK:
+    //Actually handle the event
+    if (event->type == "Attack")
+    {
 //		whoIter->second->Attack(event->info);	//These are all special functions that take in serialized data, then deserialize it and
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i Attacked!\n", event->who_id);
         }
-		break;
-	case EVENT_TYPE_DEFEND:
-//		whoIter->second->Defend(event->info);
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i Defended!\n", event->who_id);
-        }
-		break;
-	case EVENT_TYPE_TAKEDAMAGE:
-//		whoIter->second->TakeDamage(event->info);
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i Took Damage!\n", event->who_id);
-        }
-		break;
-	case EVENT_TYPE_DEATH:
-//		whoIter->second->Death(event->info);
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i Died!\n", event->who_id);
-        }
-		break;
-	case EVENT_TYPE_SPAWN:
-//		characterMap.insert(characterMap.begin(), std::pair<std::string, Character*>(event->who_id, event->info));
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i Spawned!\n", event->who_id);
-        }
-		break;
-    case EVENT_TYPE_JUMP:
-        whoIter->second->Jump(event->info);
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i Jumped!\n", event->who_id);
-        }
-        break;
-    case EVENT_TYPE_STOPJUMP:
-        whoIter->second->StopJump(event->info);
-        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
-        {
-            printf("Character with id %i stopped jumping!\n", event->who_id);
-        }
-        break;
-	case EVENT_TYPE_MOVE:
+    }
+    else if (event->type == "Move")
+    {
 		whoIter->second->Move(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i Moved!\n", event->who_id);
         }
-		break;
-    case EVENT_TYPE_STOPMOVE:
+    }
+    else if (event->type == "StopMove")
+    {
         whoIter->second->StopMove(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i Stopped Moving!\n", event->who_id);
         }
-        break;
-	case EVENT_TYPE_CHAT:
+    }
+    else if (event->type == "Chat")
+    {
 //		whoIter->second->Chat(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i Chatted!\n", event->who_id);
         }
-		break;
-	default:
+    }
+    else if (event->type == "Defend")
+    {
+//		whoIter->second->Defend(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Defended!\n", event->who_id);
+        }
+    }
+    else if (event->type == "TakeDamage")
+    {
+//		whoIter->second->TakeDamage(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Took Damage!\n", event->who_id);
+        }
+    }
+    else if (event->type == "Death")
+    {
+//		whoIter->second->Death(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Died!\n", event->who_id);
+        }
+    }
+    else if (event->type == "Spawn")
+    {
+//		characterMap.insert(characterMap.begin(), std::pair<std::string, Character*>(event->who_id, event->info));
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Spawned!\n", event->who_id);
+        }
+    }
+    else if (event->type == "Jump")
+    {
+        whoIter->second->Jump(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i Jumped!\n", event->who_id);
+        }
+    }
+    else if (event->type == "StopJump")
+    {
+        whoIter->second->StopJump(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i stopped jumping!\n", event->who_id);
+        }
+    }
+    else
+    {
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS || DEBUG_SHOWERRORS)
         {
             printf("The event type is unknown - type is %i\n", event->type);
         }
-		break;
-	}
+    }
 
 	delete event;	//This should be the only remaining pointer to this event, and it is deleted here to avoid memory leaks
 

@@ -27,15 +27,16 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 struct Event
 {
 public:
-	int type;
+	std::string type;
 	int who_id;
 	std::string info;	//This info is a serialized version of the information to be passed with the function that ought to be called by the event
 
 	Event();
-	Event(int eventType, int eventWho_id, std::string eventInfo);
+	Event(std::string eventType, int eventWho_id, std::string eventInfo);
 	static std::string Serialize(Event* event);
-    static std::string Serialize(int eventType, int eventWho_id, std::string eventInfo);
+    static std::string Serialize(std::string eventType, int eventWho_id, std::string eventInfo);
 	static Event* Deserialize(std::string eventSerial);
+    bool ShouldForward();    //All events should be send client->server, but most need not be forwarded back from server->client
 };
 
 #endif

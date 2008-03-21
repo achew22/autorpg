@@ -24,12 +24,16 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <sstream>
 #include <SDL/SDL.h>
 
-Client::Client(Fake_Server* theServer, int clientId)
+Client::Client(Fake_Server* theServer, int clientId, SDL_Surface* theScreen)
 {
     id = clientId;
     server = theServer;
     eventManager = new Event_Manager(&characterMap);
     player = NULL;
+
+    screen = theScreen;
+    dynamicLayer = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, NULL, NULL, NULL, NULL);
+    map = NULL;
 
     moveUp = SDLK_UP;
     moveDown = SDLK_DOWN;
@@ -40,6 +44,11 @@ Client::Client(Fake_Server* theServer, int clientId)
 Client::~Client()
 {
     delete eventManager;
+    SDL_FreeSurface(dynamicLayer);
+    if (map != NULL)
+    {
+        delete map;
+    }
 }
 
 bool Client::Update()
@@ -65,6 +74,13 @@ bool Client::Update()
             printf("Client %i is polling an event that occurred\n", id);
         }
     }
+
+    //Now update the positions of all of the characters that it knows of
+    for (std::map<int, Character*>::iterator i = characterMap.begin(); i != characterMap.end(); i++)
+    {
+        i->second->UpdatePosition();
+    }
+
     return true;
 }
 
@@ -91,8 +107,13 @@ bool Client::Connect(int characterId)
     }
     std::stringstream setupStream;
     setupStream.str(setupString);
-    std::string line = "";
-    getline(setupStream, line);
+    std::string line = "", mapfile = "", picfile = "";
+    getline(setupStream, line); //Should read 'Map:'
+    getline(setupStream, mapfile); //Should read 'mapfile.txt'
+    getline(setupStream, picfile); //Should read 'picturefile.png'
+    map->LoadFiles(mapfile, picfile);
+    getline(setupStream, line); //Shoud read 'Characters:'
+    getline(setupStream, line); //Should be the serialized version of the first character
     while (line != "END_")
     {
         Character* tempChar = new Character(line);

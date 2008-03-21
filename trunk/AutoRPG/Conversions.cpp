@@ -26,11 +26,25 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 std::string Conversions::IntToString(int toConvert)
 {
+    if (toConvert == 0)
+    {
+        return "0";
+    }
     std::string toReturn = "";
+    bool negative = false;
+    if (toConvert < 0)
+    {
+        negative = true;
+        toConvert *= -1;
+    }
     for (int i = 0; pow(10.0, i) < 10*toConvert; i++)
     {
         toReturn = (char)((toConvert%(int)pow(10.0, i+1))/(pow(10,i)) + '0') + toReturn;
         toConvert -= toConvert%(int)pow(10.0, i+1);
+    }
+    if (negative)
+    {
+        toReturn = "-" + toReturn;
     }
     return toReturn;
 }
@@ -38,6 +52,20 @@ std::string Conversions::IntToString(int toConvert)
 int Conversions::StringToInt(std::string toConvert)
 {
     int toReturn = 0;
+    if (toConvert.size() == 0)
+    {
+        return 0;
+    }
+    //If the string is a negative number
+    if (toConvert[0] == '-')
+    {
+        for (int i = 0; i < toConvert.size() - 1; i++)
+        {
+            toReturn += (int)((toConvert[toConvert.size()-i-1]-'0')*pow(10.0, i));
+        }
+        return toReturn * -1;
+    }
+    //If the string is a positive number
     for (int i = 0; i < toConvert.size(); i++)
     {
         toReturn += (int)((toConvert[toConvert.size()-i-1]-'0')*pow(10.0, i));

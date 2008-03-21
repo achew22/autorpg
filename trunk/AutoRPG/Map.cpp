@@ -31,6 +31,10 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 Map::Map(std::string mapFile, std::string pictureFile)
 {
+    indexFile = mapFile;
+    picFile = pictureFile;
+
+    //Read in the indexes from mapFile
     std::fstream fileIn(mapFile.c_str());
     std::string line = "";   //the current line
     getline(fileIn, line);
@@ -58,9 +62,9 @@ Map::Map(std::string mapFile, std::string pictureFile)
         }
         spriteIds.push_back(tempLine);
     }
-
     fileIn.close();
 
+    //Get the spriteSheet from picturefile
     spriteSheet = Sprite_Sheet::FindSheet(pictureFile); //First, attempt to find this spriteSheet if it has already been
         //created in memory. If not, returns NULL
     if (spriteSheet == NULL)
@@ -83,13 +87,19 @@ Map::~Map()
 void Map::LoadFiles(std::string mapFile, std::string pictureFile)
 {
     //First, get rid of all of the stuff that was already created
-    spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
-        //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+    if (spriteSheet != NULL)
+    {
+        spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
+            //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+    }
     for (int i = 0; i < spriteIds.size(); i++)
     {
         spriteIds[i].resize(0); //Delete all of the current indexes
     }
     spriteIds.resize(0);
+
+    indexFile = mapFile;
+    picFile = pictureFile;
 
     //Now load up the new files
     std::fstream fileIn(mapFile.c_str());
@@ -119,7 +129,6 @@ void Map::LoadFiles(std::string mapFile, std::string pictureFile)
         }
         spriteIds.push_back(tempLine);
     }
-
     fileIn.close();
 
     spriteSheet = Sprite_Sheet::FindSheet(pictureFile); //First, attempt to find this spriteSheet if it has already been
@@ -160,6 +169,11 @@ void Map::ApplyMap(int x, int y, int w, int h, SDL_Surface* destination)
             }
         }
     }
+}
+
+std::string Map::GetMapInfo()
+{
+    return indexFile + "\n" + picFile;
 }
 
 //Returns the dimensions of the map, in terms of how many sprites tall by how many sprites wide

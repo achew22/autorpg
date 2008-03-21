@@ -26,12 +26,13 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 #include <sstream>
 
-Character::Character(int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID)
+Character::Character(int areaId, int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID)
 {
 	flagList.push_back(1);	//Facing flag: 1-left, 2-right, 3-up, 4-down
 	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
 	flagList.push_back(0);  //Jumping flag: 0-not jumping, 1-jumping
 
+    currentAreaId = areaId;
     pos.x = locx;
 	pos.y = locy;
 	dim.x = width;
@@ -130,23 +131,38 @@ Character::Character(std::string serialized)
 
     std::stringstream inString;
     inString.str(serialized);
+
     std::string temp;
+    inString >> temp;   //Should be 'Pos.x:'
     inString >> temp;
     pos.x = Conversions::StringToInt(temp);
+    inString >> temp;   //Should be 'Pos.y:'
     inString >> temp;
 	pos.y = Conversions::StringToInt(temp);
+    inString >> temp;   //Should be 'Dim.x:'
     inString >> temp;
 	dim.x = Conversions::StringToInt(temp);
+    inString >> temp;   //Should be 'Dim.y:'
     inString >> temp;
 	dim.y = Conversions::StringToInt(temp);
+    inString >> temp;   //Should be 'Vel.x:'
     inString >> temp;
 	vel.x = Conversions::StringToInt(temp);
+    inString >> temp;   //Should be 'Vel.y:'
     inString >> temp;
 	vel.y = Conversions::StringToInt(temp);
-
+    inString >> temp;   //Should be 'Id:'
     inString >> temp;
 	id = Conversions::StringToInt(temp);
-	clientId = -1;  //No client yet assigned
+	inString >> temp;   //Should be 'CurrentSectorId:'
+	inString >> temp;
+	currentSectorId = Conversions::StringToInt(temp);
+	inString >> temp;   //Should be 'CurrentAreaId:'
+	inString >> temp;
+	currentAreaId = Conversions::StringToInt(temp);
+	inString >> temp;   //Should be 'ClientId:'
+	inString >> temp;
+	clientId = Conversions::StringToInt(temp);
 
 	destination = NULL;
 	lastTime = SDL_GetTicks();
@@ -309,6 +325,11 @@ int Character::GetId()
 int Character::GetClientId()
 {
 	return clientId;
+}
+
+int Character::GetAreaId()
+{
+    return currentAreaId;
 }
 
 void Character::AssignClient(int theClientId)
@@ -665,13 +686,16 @@ Point Character::GetVelocity()
 std::string Character::Serialize()
 {
     std::string serialized = "";
-    serialized += Conversions::IntToString(pos.x) + " ";
-    serialized += Conversions::IntToString(pos.y) + " ";
-    serialized += Conversions::IntToString(dim.x) + " ";
-    serialized += Conversions::IntToString(dim.y) + " ";
-    serialized += Conversions::IntToString(vel.x) + " ";
-    serialized += Conversions::IntToString(vel.y) + " ";
-    serialized += Conversions::IntToString(id) + " ";
+    serialized += "Pos.x: " + Conversions::IntToString(pos.x) + " ";
+    serialized += "Pos.y: " + Conversions::IntToString(pos.y) + " ";
+    serialized += "Dim.x: " + Conversions::IntToString(dim.x) + " ";
+    serialized += "Dim.y: " + Conversions::IntToString(dim.y) + " ";
+    serialized += "Vel.x: " + Conversions::IntToString(vel.x) + " ";
+    serialized += "Vel.y: " + Conversions::IntToString(vel.y) + " ";
+    serialized += "Id: " + Conversions::IntToString(id) + " ";
+    serialized += "CurrentSectorId: " + Conversions::IntToString(currentSectorId) + " ";
+    serialized += "CurrentAreaId: " + Conversions::IntToString(currentAreaId) + " ";
+    serialized += "ClientId: " + Conversions::IntToString(clientId) + " ";
     return serialized;
 }
 

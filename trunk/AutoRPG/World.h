@@ -30,7 +30,7 @@ class World
 {
 private:
     std::map<int, Character*> characterMap;
-    std::vector<Area*> areaVect;
+    std::map<int, Area*> areaMap;
     std::string file;
 public:
     World(std::string filename);
@@ -39,6 +39,7 @@ public:
     void RemoveCharacter(int id);
     Character* GetCharacter(int id);
     std::map<int, Character*>* GetCharacterMap();
+    Area* GetArea(int id);
 };
 
 #endif

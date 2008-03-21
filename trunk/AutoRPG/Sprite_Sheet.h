@@ -38,6 +38,7 @@ private:
     static std::list<Sprite_Sheet*> spriteSheetList;
     std::string filename;
     Point spriteDim;
+    int numUsers;
 public:
     Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int red = 0, int green = 255, int blue = 255);
     ~Sprite_Sheet();    //The destructor
@@ -45,6 +46,9 @@ public:
         //to the surface destination at the coordinates x, y
     bool operator ==(Sprite_Sheet* compare); //The obvious, compare two Sprite_Sheets
     Point GetSpriteDimension(); //Returns the width and height of the sprites
+    void AddUser();     //Used in conjunction with the function below
+    void RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
+        //keep track of how many users are using it. If that number drops to zero, it deletes itself.
     static Sprite_Sheet* FindSheet(std::string file);   //Returns a pointer to the spriteSheet that was already
         //created with the file specified by "file". If none yet exists, returns NULL. Use this to prevent creating
         //multiple identical Sprite_Sheets, thereby wasting memory.

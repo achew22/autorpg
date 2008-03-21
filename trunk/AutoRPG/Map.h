@@ -34,8 +34,10 @@ private:
     Point spriteDim;
 public:
     Map(std::string mapFile, std::string pictureFile);
+    ~Map();
+    void LoadFiles(std::string mapFile, std::string pictureFile);
     void ApplyMap(int x, int y, int h, int w, SDL_Surface* destination);
-    Point GetDim();
+    Point GetDim(); //Returns the dimensions of the map, in terms of how many sprites tall by how many sprites wide
 };
 
 #endif

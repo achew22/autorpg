@@ -30,51 +30,69 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 Event::Event()
 {
-	type = 0;
+	type = "";
 	who_id = 0;
 	info = "";
 }
 
-Event::Event(int eventType, int eventWho_id, std::string eventInfo)
+Event::Event(std::string eventType, int eventWho_id, std::string eventInfo)
 {
 	type = eventType;
 	who_id = eventWho_id;
 	info = eventInfo;
 }
 
+//Turns an event into a string for transportation
 std::string Event::Serialize(Event* event)
 {
 	std::string serial = "";
-	serial += Conversions::IntToString(event->type) + " ";
-	serial += Conversions::IntToString(event->who_id) + "\n";
-	serial += event->info + " ";
+    serial += "EventType: " + event->type + "\n";
+    serial += "CharacterId: " + Conversions::IntToString(event->who_id) + "\n";
+    serial += "Info: " + event->info;
 	return serial;
 }
 
-std::string Event::Serialize(int eventType, int eventWho_id, std::string eventInfo)
+//This is the preferred method of using serialize, though it isn't too important
+std::string Event::Serialize(std::string eventType, int eventWho_id, std::string eventInfo)
 {
     std::string serial = "";
-    serial += Conversions::IntToString(eventType) + " ";
-    serial += Conversions::IntToString(eventWho_id) + "\n";
-    serial += eventInfo;
+    serial += "EventType: " + eventType + "\n";
+    serial += "CharacterId: " + Conversions::IntToString(eventWho_id) + "\n";
+    serial += "Info: " + eventInfo;
     return serial;
 }
 
 //Note: Whenever this function is called, it dynamically allocates memory, and that memory must be deleted
-//The event looks like this:
-//"eventType who_id"
-//"Info1 info2 info3 ...."
+//The event looks like this: "EventType: type\nCharacterId: who_id\nInfo: info" Or equavalently:
+//EventType: type
+//CharacterId: who_id
+//Info: info
+//The '\n' is put in between each so that a simple getline() call will work, especially since info may be especially large
 Event* Event::Deserialize(std::string eventSerial)
 {
 	Event* event = new Event();
 	std::string temp;
 	std::stringstream inStream;
 	inStream.str(eventSerial);
-	inStream >> temp;
-	event->type = Conversions::StringToInt(temp);
-	inStream >> temp;
+	inStream >> temp;   //Pull in 'EventType:'
+	inStream.get();      //Get the " "
+	getline(inStream, temp);    //Pull in 'type'
+	inStream.get();     //Get the '\n'
+	event->type = temp;
+	inStream >> temp;   //Pull in 'CharacterId:'
+	inStream.get();      //Get the " "
+	getline(inStream, temp);   //Pull in 'who_id'
+	inStream.get();     //Get the '\n'
 	event->who_id = Conversions::StringToInt(temp);
-	inStream.get();
-	getline(inStream, event->info);
+	inStream >> temp;   //Pull in 'Info:'
+	inStream.get();      //Get the " "
+	getline(inStream, temp);    //Pull in 'info'
+	event->info = temp;
 	return event;
+}
+
+bool Event::ShouldForward()
+{
+    //This needs to be changed so that only the right events are forwarded
+    return true;
 }

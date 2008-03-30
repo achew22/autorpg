@@ -22,6 +22,9 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 //Debug options for choosing whether or not to show some debug messages
+
+#include <string>
+
 const bool DEBUG_SHOWALL = false;
 const bool DEBUG_SHOWFPS = false;
 const bool DEBUG_SHOWEVENTS = false;
@@ -31,6 +34,8 @@ const bool DEBUG_SHOWERRORS = true;
 static const int SCREEN_WIDTH = 500;	//Screen width
 static const int SCREEN_HEIGHT = 500;	//Screen height
 static const int SCREEN_BPP = 32;	//Screen BPP
+const int PORT = 2000;  //Port
+const std::string ADDRESS = "localhost"; //host address
 
 const int CHARACTER_WIDTH = 48;
 const int CHARACTER_HEIGHT = 64;

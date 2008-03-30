@@ -25,11 +25,20 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Conversions.h"
 #include "Fake_Server.h"
 #include "Client.h"
+#include "SDL/SDL.h"
+#include "SDL/SDL_thread.h"
+#include "SDL/SDL_net.h"
 
 #include <stdio.h>
 
+SDLNet_SocketSet set;
+TCPsocket sock;
+
+bool Init();
+
 int main(int argc, char *args[])
 {
+    if (!Init()) {return 1;}
     Graphics graphics;
    	if (!graphics.Init()) {printf("Init failed\n"); return 1;}
 
@@ -128,3 +137,38 @@ int main(int argc, char *args[])
 
 	return 0;
 }
+
+bool Init()
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
+    if (SDLNet_Init() == -1)
+    {
+        printf("Error with init\n");
+        return false;
+    }
+    set = SDLNet_AllocSocketSet(1);
+    if (!set)
+    {
+        printf("Error with set\n");
+        return false;
+    }
+    IPaddress ip;
+    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
+    {
+        printf("Error with connect\n");
+        return false;
+    }
+    sock = SDLNet_TCP_Open(&ip);
+    if (!sock)
+    {
+        printf("Error with sock\n");
+        return false;
+    }
+    if (SDLNet_TCP_AddSocket(set, sock) == -1)
+    {
+        printf("Error with add socket\n");
+        return false;
+    }
+    SDL_WM_SetCaption("AutoRPG - Development", NULL);
+}
+

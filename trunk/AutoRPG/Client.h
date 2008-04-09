@@ -4,20 +4,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -54,6 +54,8 @@ private:
     SDLKey moveDown;
     SDLKey moveLeft;
     SDLKey moveRight;
+    SDLKey attack;
+    SDLKey changeTarget;
 public:
     Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, SDL_Surface* theDynamicLayer,*/ Graphics* theGraphics);
     ~Client();
@@ -61,7 +63,7 @@ public:
     bool Update();
     bool UpdateEvents();
     bool UpdatePositions();
-    void SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight);
+    void SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight, SDLKey keyAttack, SDLKey keyChangeTarget);
 	int GetId();
 	Character* GetPlayer();
     bool Connect(int characterId);  //Connects to the server using character with id characterId

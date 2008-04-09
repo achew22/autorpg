@@ -4,20 +4,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -98,6 +98,7 @@ public:
 	void ChangeAnimation(Animation* animation);
     void UpdatePosition();  //Updates everything but the animation
 	void UpdateAnimation();	//Updates the surface on which the character should be updated
+	bool PeekEvent();   //Returns whether or not there are events to poll
 	std::string PollEvent();    //Get the first event in the event queue, returns "NULL" otherwise
     Point GetPosition();
     static void CleanUp();  //Cleans up all of the dynamically allocated memory stored in characterList
@@ -131,6 +132,10 @@ public:
 	void Defend(std::string info);
 	void TakeDamage(int amount, bool addEvent = true);
 	void TakeDamage(std::string info);
+	void UseMagic(int amount, bool addEvent = true);
+	void UseMagic(std::string info);
+	void Die(bool addEvent = true);
+	void Die(std::string info);
 
 	//Serialize this character, for transport
 	std::string Serialize();

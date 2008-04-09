@@ -1,20 +1,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -114,7 +114,14 @@ bool Event_Manager::PollEvent()
         std::string temp = "";
         inString >> temp;   //Should read "New_Target:"
         inString >> temp;   //Should be the new target's id number
-        whoIter->second->ChangeTarget(event->info, characterMap->find(Conversions::StringToInt(temp))->second);
+        if (temp == "None")
+        {
+            whoIter->second->ChangeTarget(NULL);
+        }
+        else
+        {
+            whoIter->second->ChangeTarget(event->info, characterMap->find(Conversions::StringToInt(temp))->second);
+        }
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i (client %i) Changed targets to character with id %s!\n", event->who_id, whoIter->second->GetClientId(),  temp.c_str());
@@ -144,9 +151,17 @@ bool Event_Manager::PollEvent()
             printf("Character with id %i (client %i) Took Damage!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
-    else if (event->type == "Death")
+    else if (event->type == "UseMagic")
     {
-//		whoIter->second->Death(event->info);
+        whoIter->second->UseMagic(event->info);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i (client %i) Used Magic!\n", event->who_id, whoIter->second->GetClientId());
+        }
+    }
+    else if (event->type == "Die")
+    {
+//		whoIter->second->Die(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Character with id %i (client %i) Died!\n", event->who_id, whoIter->second->GetClientId());

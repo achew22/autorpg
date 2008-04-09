@@ -1,20 +1,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -72,12 +72,10 @@ void Graphics::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destin
 //Initialize the SDL libraries to be used, returns false if it fails
 bool Graphics::Init()
 {
-//    if (SDL_Init(SDL_INIT_VIDEO) == -1) {return false;}
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF/* | SDL_NOFRAME*/);
     if (screen == NULL) {return false;}
     dynamicLayer = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, NULL, NULL, NULL, NULL);
     if (dynamicLayer == NULL) {return false;}
-//    SDL_WM_SetCaption("AutoRPG - Development", NULL);
     return true;
 }
 
@@ -141,6 +139,22 @@ bool Graphics::Update()
 	if (map != NULL)
 	{
         map->ApplyMap(screenLocation.x, screenLocation.y, SCREEN_HEIGHT, SCREEN_WIDTH, dynamicLayer);
+	}
+
+	//Whoever is targeted, make a square underneath them so we know
+	SDL_Rect clip;
+	Character* target = NULL;
+	if (player != NULL)
+	{
+        target = player->GetTarget();
+	}
+	if (target != NULL)
+	{
+        clip.x = target->GetPosition().x + 2;
+        clip.w = CHARACTER_WIDTH - 4;
+        clip.y = target->GetPosition().y + 54;
+        clip.h = 20;
+        SDL_FillRect(dynamicLayer, &clip, SDL_MapRGB(dynamicLayer->format, 0, 255, 255));
 	}
 
     //Frames per second calculator

@@ -1,20 +1,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -166,9 +166,7 @@ Character::Character(std::string serialized, SDL_Surface* destinationSurface)
 	inString >> temp;   //Should be 'CurrentAreaId:'
 	inString >> temp;
 	currentAreaId = Conversions::StringToInt(temp);
-	inString >> temp;   //Should be 'ClientId:'
-	inString >> temp;
-	clientId = Conversions::StringToInt(temp);
+	clientId = -1;
 
 	destination = destinationSurface;
 	lastTime = SDL_GetTicks();
@@ -320,7 +318,13 @@ void Character::UpdateAnimation()
 	lastTime = SDL_GetTicks();  //Update the lastTime function
 }
 
-//Returns the next serialized event, or "NULL" if there are no events
+//Returns true if there are events to be processed, false otherwise
+bool Character::PeekEvent()
+{
+    return !eventQueue.empty();
+}
+
+//Returns the next serialized event, which is an event this character created, or "NULL" if there are no events
 std::string Character::PollEvent()
 {
     if (eventQueue.empty())
@@ -396,7 +400,7 @@ void Character::Jump(bool addEvent /*=true*/)
         flagList[FLAG_JUMPING] = 1;
     }
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Jump", id, "NULL"));
     }
@@ -449,7 +453,7 @@ void Character::StopJump(bool addEvent /*=true*/)
     vel.y = 0;
     flagList[FLAG_JUMPING] = 0;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("StopJump", id, "NULL"));
     }
@@ -540,7 +544,7 @@ void Character::MoveLeft(bool addEvent /*=true*/)
     flagList[FLAG_FACING] = 1;
     vel.x = -80;   //800 pixels per second, give or take
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Move", id, "Direction: Left xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
@@ -560,7 +564,7 @@ void Character::MoveRight(bool addEvent /*=true*/)
     flagList[FLAG_FACING] = 2;
     vel.x = 80;    //800 pixels per second, give or take
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Move", id, "Direction: Right xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
@@ -573,7 +577,7 @@ void Character::MoveUp(bool addEvent /*=true*/)
     flagList[FLAG_FACING] = 3;
     vel.y = -80;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Move", id, "Direction: Up xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
@@ -586,7 +590,7 @@ void Character::MoveDown(bool addEvent /*=true*/)
     flagList[FLAG_FACING] = 4;
     vel.y = 80;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Move", id, "Direction: Down xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
@@ -668,7 +672,7 @@ void Character::StopMoveHoriz(bool addEvent /*=true*/)
     }
     vel.x = 0;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("StopMove", id, "Direction: Horiz xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
@@ -697,9 +701,9 @@ void Character::StopMoveVert(bool addEvent /*=true*/)
     }
     vel.y = 0;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
-        eventQueue.push(Event::Serialize("StopMove", id,"Direction: Vert xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
+        eventQueue.push(Event::Serialize("StopMove", id, "Direction: Vert xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
 }
 
@@ -707,9 +711,16 @@ void Character::ChangeTarget(Character* theTarget, bool addEvent /* = true */)
 {
     target = theTarget;
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
-        eventQueue.push(Event::Serialize("ChangeTarget", id, "New_Target: " + Conversions::IntToString(target->id)));
+        if (target != NULL)
+        {
+            eventQueue.push(Event::Serialize("ChangeTarget", id, "New_Target: " + Conversions::IntToString(target->id)));
+        }
+        else
+        {
+            eventQueue.push(Event::Serialize("ChangeTarget", id, "New_Target: None"));
+        }
     }
 }
 
@@ -730,9 +741,10 @@ void Character::Attack(bool addEvent /* = true */)
         return;
     }
 
-    target->TakeDamage(10);
+    UseMagic(5, addEvent);
+    target->TakeDamage(10, addEvent);
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("Attack", id, "NULL"));
     }
@@ -751,19 +763,19 @@ void Character::Defend(std::string info)
 {
 }
 
+//These functions should probably be moved to private, and only be accessed by the Defend function
+    //but I'll do that later, when I feel like it
 void Character::TakeDamage(int amount, bool addEvent /* = true */)
 {
-    printf("Processing the TakeDamage function, not triggered by event, for character %i (client %i)\n", id, clientId);
     remainingHealth -= amount;
-    printf("Remaining health is now %i\n", remainingHealth);
     if (remainingHealth <= 0)
     {
-        //Make them dead here...somehow
+        Die(addEvent);
         remainingHealth = 0;
     }
     healthMeter->SetPercent((remainingHealth * 100)/totalHealth);
 
-    if (addEvent)
+    if (addEvent && (clientId != -1))
     {
         eventQueue.push(Event::Serialize("TakeDamage", id, "Amount: " + Conversions::IntToString(amount)));
     }
@@ -771,13 +783,52 @@ void Character::TakeDamage(int amount, bool addEvent /* = true */)
 
 void Character::TakeDamage(std::string info)
 {
-    printf("Processing the TakeDamage function, triggered by an event, for character %i (client %i)\n", id, clientId);
     std::stringstream inString;
     inString.str(info);
     std::string temp = "";
     inString >> temp;   //Should read "Amount:"
     inString >> temp;   //Should be the amount
     TakeDamage(Conversions::StringToInt(temp), false);
+}
+
+void Character::UseMagic(int amount, bool addEvent /* = true */)
+{
+    remainingMagic -= amount;
+    if (remainingMagic < 0)
+    {
+        remainingMagic = 0;
+    }
+    magicMeter->SetPercent((remainingMagic * 100)/totalMagic);
+
+    if (addEvent && (clientId != -1))
+    {
+        eventQueue.push(Event::Serialize("UseMagic", id, "Amount: " + Conversions::IntToString(amount)));
+    }
+}
+
+void Character::UseMagic(std::string info)
+{
+    std::stringstream inString;
+    inString.str(info);
+    std::string temp = "";
+    inString >> temp;   //Should read "Amount:"
+    inString >> temp;   //Should be the amount
+    UseMagic(Conversions::StringToInt(temp), false);
+}
+
+//Note: this does not yet do anything at all
+void Character::Die(bool addEvent /* = true */)
+{
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Die", id, "NULL"));
+    }
+}
+
+//Note: neither does this
+void Character::Die(std::string info)
+{
+    Die(false);
 }
 
 Point Character::GetVelocity()
@@ -797,7 +848,6 @@ std::string Character::Serialize()
     serialized += "Id: " + Conversions::IntToString(id) + " ";
     serialized += "CurrentSectorId: " + Conversions::IntToString(currentSectorId) + " ";
     serialized += "CurrentAreaId: " + Conversions::IntToString(currentAreaId) + " ";
-    serialized += "ClientId: " + Conversions::IntToString(clientId) + " ";
     return serialized;
 }
 

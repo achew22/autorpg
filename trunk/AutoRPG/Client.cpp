@@ -1,20 +1,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -40,6 +40,8 @@ Client::Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, S
     moveDown = SDLK_DOWN;
     moveLeft = SDLK_LEFT;
     moveRight = SDLK_RIGHT;
+    attack = SDLK_SPACE;
+    changeTarget = SDLK_TAB;
 }
 
 Client::~Client()
@@ -71,17 +73,15 @@ bool Client::Update()
     //testing purposes, just use Update()
 bool Client::UpdateEvents()
 {
-    std::string event = player->PollEvent();
-
     //First, send all of the events that the character did to the server
-    while (event != "NULL")
+    while (player->PeekEvent())
     {
+        std::string event = player->PollEvent();
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Client %i sent an event with string '%s' to the server!\n", id, event.c_str());
         }
         SendEventToServer(event);
-        event = player->PollEvent();
     }
 
     //Now process all of the events that the server sent to the client
@@ -109,12 +109,14 @@ bool Client::UpdatePositions()
     return true;
 }
 
-void Client::SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight)
+void Client::SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight, SDLKey keyAttack, SDLKey keyChangeTarget)
 {
     moveUp = keyUp;
     moveDown = keyDown;
     moveLeft = keyLeft;
     moveRight = keyRight;
+    attack = keyAttack;
+    changeTarget = keyChangeTarget;
 }
 
 int Client::GetId()
@@ -165,6 +167,7 @@ bool Client::Connect(int characterId)
         getline(setupStream, line);
     }
     player = characterMap.find(characterId)->second;
+    player->AssignClient(id);
     if (graphics != NULL)
     {
         graphics->SetPlayer(player);
@@ -215,9 +218,24 @@ void Client::HandleInput(SDL_Event SDLEvent)
         {
             player->MoveUp();
         }
-        else if (keyPressed == SDLK_SPACE)
+        else if (keyPressed == attack)
         {
-            player->Attack(player->GetTarget());
+            player->Attack();
+        }
+        else if (keyPressed == changeTarget)
+        {
+            Character* closest = NULL;
+            for (std::map<int, Character*>::iterator i = characterMap.begin(); i != characterMap.end(); i++)
+            {
+                if ((closest == NULL) || ((abs(i->second->GetPosition().x - player->GetPosition().x) + abs(i->second->GetPosition().y - player->GetPosition().y) < abs(closest->GetPosition().x - player->GetPosition().x) + abs(closest->GetPosition().y - player->GetPosition().y))))
+                {
+                    if (i->second != player && i->second != player->GetTarget())    //Don't let them target themselves this way, or their current target
+                    {
+                        closest = i->second;
+                    }
+                }
+            }
+            player->ChangeTarget(closest);
         }
     }
     else if (SDLEvent.type == SDL_KEYUP)

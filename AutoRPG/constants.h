@@ -35,7 +35,7 @@ static const int SCREEN_WIDTH = 500;	//Screen width
 static const int SCREEN_HEIGHT = 500;	//Screen height
 static const int SCREEN_BPP = 32;	//Screen BPP
 const int PORT = 2000;  //Port
-const std::string ADDRESS = "localhost"; //host address
+const std::string ADDRESS = "138.86.201.218"; //host address
 
 const int CHARACTER_WIDTH = 48;
 const int CHARACTER_HEIGHT = 64;

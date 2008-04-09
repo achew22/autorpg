@@ -28,6 +28,7 @@ along with Coralstone (Called LICENSE.txt).  If not, see
 #include "Area.h"
 #include "Fake_Server.h"
 #include "Graphics.h"
+#include "Network_Class.h"
 
 #include <SDL/SDL.h>
 #include <map>
@@ -38,6 +39,7 @@ class Client
 {
 private:
     int id;
+    Network_Class* networkClass;
     Event_Manager* eventManager;
     std::map<int, Character*> characterMap;
     Fake_Server* server;
@@ -67,8 +69,10 @@ public:
 	int GetId();
 	Character* GetPlayer();
     bool Connect(int characterId);  //Connects to the server using character with id characterId
+    bool ConnectRemote(int characterId);    //Connect remotely
 	void RegisterEvent(std::string event);  //Let the Client know that an event has occurred
 	void SendEventToServer(std::string event);  //Send a serialized event to server - often occurs in tandem with the function above
+	bool SendEventToRemoteServer(std::string event);
     bool PollEvent();   //Process the next event in eventManager. Returns false if there are no more events to poll
     bool PeekEvent();   //Return whether or not there is an event to Poll
     void HandleInput(SDL_Event SDLEvent);   //Handle the input from SDL, such as keypresses and mouse clicks

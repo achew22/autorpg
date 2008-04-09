@@ -20,17 +20,19 @@ along with Coralstone (Called LICENSE.txt).  If not, see
 
 #include "Client.h"
 #include "Graphics.h"
+#include "Conversions.h"
 
 #include <string>
 #include <sstream>
 #include <SDL/SDL.h>
 
-Client::Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, SDL_Surface* theDynamicLayer,*/ Graphics* theGraphics)
+Client::Client(Fake_Server* theServer, int clientId, Graphics* theGraphics)
 {
     id = clientId;
     server = theServer;
     eventManager = new Event_Manager(&characterMap);
     player = NULL;
+    networkClass = new Network_Class();
 
     map = NULL;
 
@@ -46,7 +48,9 @@ Client::Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, S
 
 Client::~Client()
 {
+    SendEventToRemoteServer("exit");
     delete eventManager;
+    delete networkClass;
     if (map != NULL)
     {
         delete map;
@@ -175,6 +179,61 @@ bool Client::Connect(int characterId)
     return true;
 }
 
+bool Client::ConnectRemote(int characterId)
+{
+    printf("Attempting to connect\n");
+    networkClass->Connect(ADDRESS, PORT);
+    while (!networkClass->Ready()) {}   //Wait
+    printf("%s\n", networkClass->Read().c_str());
+    networkClass->Write("characterId: " + Conversions::IntToString(characterId));
+    while (!networkClass->Ready()) {}   //Wait
+
+    /*std::string setupString = networkClass->Read();
+    if (setupString == "FAILED")
+    {
+        return false;
+    }
+    std::stringstream setupStream;
+    setupStream.str(setupString);
+    std::string line = "", mapfile = "", picfile = "";
+    getline(setupStream, line); //Should read 'Map:'
+    getline(setupStream, mapfile); //Should read 'mapfile.txt'
+    getline(setupStream, picfile); //Should read 'picturefile.png'
+    getline(setupStream, line); //Should read 'END_'
+    map = new Map(mapfile, picfile);
+    if (graphics != NULL)
+    {
+        graphics->SetMap(map);
+    }
+    getline(setupStream, line); //Shoud read 'Characters:'
+    getline(setupStream, line); //Should be the serialized version of the first character
+    SDL_Surface* dynamicLayer = NULL;
+    if (graphics != NULL)
+    {
+        dynamicLayer = graphics->GetDynamicLayer();
+    }
+    while (line != "END_")
+    {
+        Character* tempChar = new Character(line, dynamicLayer);
+        characterMap.insert(std::pair<int, Character*>(tempChar->GetId(), tempChar));
+        if (graphics != NULL)
+        {
+            graphics->AddCharacter(tempChar);
+        }
+        getline(setupStream, line);
+    }
+    player = characterMap.find(characterId)->second;
+    player->AssignClient(id);
+    if (graphics != NULL)
+    {
+        graphics->SetPlayer(player);
+    }*/
+
+    printf("Client recieved string!\n%s\n", networkClass->Read().c_str());
+
+    return true;
+}
+
 void Client::RegisterEvent(std::string event)
 {
 	eventManager->AddEvent(event);
@@ -183,6 +242,11 @@ void Client::RegisterEvent(std::string event)
 void Client::SendEventToServer(std::string event)
 {
     server->RegisterEvent(event, id);
+}
+
+bool Client::SendEventToRemoteServer(std::string event)
+{
+    return networkClass->Write(event);
 }
 
 //Poll an event

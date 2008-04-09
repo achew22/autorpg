@@ -19,17 +19,16 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "constants.h"
-#include "Instance.h"
 #include "Character.h"
 #include "Graphics.h"
 #include "Conversions.h"
 #include "Fake_Server.h"
 #include "Client.h"
-#include "SDL/SDL.h"
-#include "SDL/SDL_thread.h"
-#include "SDL/SDL_net.h"
 
 #include <stdio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
+#include <SDL/SDL_net.h>
 
 SDLNet_SocketSet set;
 TCPsocket sock;
@@ -43,18 +42,16 @@ int main(int argc, char *args[])
    	if (!graphics.Init()) {printf("Init failed\n"); return 1;}
 
     Fake_Server server("server/server1.txt");
-    Client client1(&server, 1, graphics.GetScreen());
-    Client client2(&server, 2, graphics.GetScreen());
+    Client client1(&server, 1, &graphics);
+    graphics.SetPlayer(client1.GetPlayer());
+    client1.LoadMap("maps/map1.txt", "maps/map1.gif");
+    Client client2(&server, 2, NULL);
     if (!client1.Connect(1)) {return 1;}
     if (!client2.Connect(2)) {return 1;}
     client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
 
-    Instance instance1(0, 0, graphics.GetScreen());
-
-	if (!instance1.LoadFiles()) {printf("LoadFiles failed\n"); return 1;}
-	instance1.LoadMap("maps/map1.txt", "maps/map1.gif");
-	instance1.SetUpDynamicObjects();
-	if (!instance1.Update()) {printf("Update failed\n"); return 1;}
+    //This area reserved for testing experiments
+    client1.GetPlayer()->ChangeTarget(client2.GetPlayer());
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -68,53 +65,12 @@ int main(int argc, char *args[])
 			{
 				switch (SDLEvent.key.keysym.sym)
 				{
-				case SDLK_RIGHT:    //Right button pressed
-					instance1.GetPlayer()->MoveRight();
-					break;
-				case SDLK_LEFT:     //Left button pressed
-					instance1.GetPlayer()->MoveLeft();
-					break;
-				case SDLK_UP:		//Up button pressed
-					instance1.GetPlayer()->MoveUp();
-					break;
-                case SDLK_DOWN:     //Down button pressed
-                    instance1.GetPlayer()->MoveDown();
+                case SDLK_SPACE:
+                    client1.GetPlayer()->Attack();
                     break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
-                default:
-                    break;
-				}
-			}
-			else if (SDLEvent.type == SDL_KEYUP)
-			{
-				switch (SDLEvent.key.keysym.sym)
-				{
-				case SDLK_RIGHT:    //Right button released
-					if (instance1.GetPlayer()->GetVelocity().x > 0)   //If you were moving right
-					{
-						instance1.GetPlayer()->StopMoveHoriz();    //Stop moving right
-					}
-					break;
-				case SDLK_LEFT:     //Left button released
-					if (instance1.GetPlayer()->GetVelocity().x < 0)   //If you were moving left
-					{
-						instance1.GetPlayer()->StopMoveHoriz();    //Stop moving left
-					}
-					break;
-                case SDLK_UP:     //Up button released
-					if (instance1.GetPlayer()->GetVelocity().y < 0)   //If you were moving up
-					{
-						instance1.GetPlayer()->StopMoveVert();    //Stop moving up
-					}
-					break;
-                case SDLK_DOWN: //Down button released
-                    if (instance1.GetPlayer()->GetVelocity().y > 0) //If you were moving down
-                    {
-                        instance1.GetPlayer()->StopMoveVert();  //Stop moving down
-                    }
-                    break;
                 default:
                     break;
 				}
@@ -124,14 +80,12 @@ int main(int argc, char *args[])
 				quit = true;    //If the person "X"'s out of the window
 			}
 		}
-		if (!instance1.Update()) {return 1;}    //Update
+		if (!(client2.UpdateEvents() && client2.UpdatePositions())) {return 1;}      //Update
 		if (!client1.Update()) {return 1;}      //Update
-		if (!client2.Update()) {return 1;}      //Update
 		if (!server.Update()) {return 1;}       //Update
 		if (!graphics.Update()) {return 1;}     //Update
 	}
 
-	instance1.CleanUp();    //Clean up all dynamically allocated memory
 	graphics.CleanUp();
 	Sprite_Sheet::CleanUp();
 
@@ -171,4 +125,3 @@ bool Init()
     }
     SDL_WM_SetCaption("AutoRPG - Development", NULL);
 }
-

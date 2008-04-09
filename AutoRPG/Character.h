@@ -26,6 +26,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Point.h"
 #include "Sector.h"
 #include "Area.h"
+#include "Meter.h"
 
 #include <SDL/SDL.h>
 #include <map>
@@ -34,13 +35,13 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include <queue>
 
 //The class for any and all characters in the game.
+    //Dynamically allocates memory for healthMeter and magicMeter
 class Character
 {
 private:
     Point pos;  //Position
 	Point dim;  //Dimensions
 	Point vel;	//Velocity in pixels per second
-	Point init; //Initialized values
 	int id;  //The unique id of this character
 	std::vector<Slot> inventory;    //The inventory
 
@@ -59,7 +60,6 @@ private:
     std::queue<std::string> eventQueue;  //Holds all of the events that this Character creates, so that they might be polled by
         //the Client
 
-	double fpsTicks, fpsFrames; //Used for calculating framerate
 	enum
 	{
 		FLAG_FACING,	    //The flag indicating which way the character is facing
@@ -81,9 +81,19 @@ private:
 		ANIM_STILLUP,       //standing still, facing up
 		ANIM_STILLDOWN,     //standing still, facing down
 	};
+
+	int totalMagic;
+	int totalHealth;
+	int remainingMagic;
+	int remainingHealth;
+	Meter* healthMeter;
+	Meter* magicMeter;
+
+	Character* target;
 public:
 	Character(int areaId, int locx, int locy, int width, int height, SDL_Surface *destinationSurface, int ID);
-	Character(std::string serialized);
+	Character(std::string serialized, SDL_Surface* destinationSurface);
+	~Character();
 	void AddAnimation(std::vector<int> animation, std::string filename = "images/miniDungeonCharSprites2x.png");
 	void ChangeAnimation(Animation* animation);
     void UpdatePosition();  //Updates everything but the animation
@@ -95,6 +105,7 @@ public:
 	int GetId();    //Returns the id
 	int GetClientId();	//Returns the client id number
 	int GetAreaId();    //Returns the area id
+	Character* GetTarget();    //Returns a pointer to the target
 	void AssignClient(int theClientId);
 
 	//Below are all of the functions corresponding to events. If a function is overloaded with the string
@@ -112,6 +123,14 @@ public:
 	void StopMove(std::string info);
 	void StopMoveHoriz(bool addEvent = true);
 	void StopMoveVert(bool addEvent = true);
+	void ChangeTarget(Character* theTarget, bool addEvent = true);
+    void ChangeTarget(std::string info, Character* theTarget);
+	void Attack(bool addEvent = true);
+	void Attack(std::string info);
+	void Defend(bool addEvent = true);
+	void Defend(std::string info);
+	void TakeDamage(int amount, bool addEvent = true);
+	void TakeDamage(std::string info);
 
 	//Serialize this character, for transport
 	std::string Serialize();

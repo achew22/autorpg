@@ -57,7 +57,7 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
     sprites.resize(numx*numy);
     for (int i = 0; i < numx*numy; i++)
     {
-        sprites[i] = SDL_CreateRGBSurface(SDL_SWSURFACE, wOfSprite, hOfSprite, SCREEN_BPP, NULL, NULL, NULL, NULL);
+        sprites[i] = SDL_CreateRGBSurface(SDL_HWSURFACE, wOfSprite, hOfSprite, SCREEN_BPP, NULL, NULL, NULL, NULL);
     }
     SDL_Rect clip;
     clip.w = wOfSprite;
@@ -88,7 +88,7 @@ Sprite_Sheet::Sprite_Sheet(int wOfSprite, int hOfSprite, std::string file, int r
 
 Sprite_Sheet::~Sprite_Sheet()
 {
-    for (int i = 0; i < sprites.size(); i++)
+    for (unsigned int i = 0; i < sprites.size(); i++)
     {
         if (sprites[i] != NULL)
         {
@@ -100,7 +100,7 @@ Sprite_Sheet::~Sprite_Sheet()
 
 void Sprite_Sheet::ApplySprite(int x, int y, int spriteNum, SDL_Surface* destination)
 {
-    if (spriteNum >= sprites.size() || spriteNum < 0)
+    if ((unsigned int)spriteNum >= sprites.size() || spriteNum < 0)
     {
         if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
         {
@@ -160,6 +160,7 @@ void Sprite_Sheet::CleanUp()
         if ((*i) != NULL)
         {
             delete (*i);
+            i = spriteSheetList.begin();
         }
     }
 }
@@ -170,7 +171,7 @@ void Sprite_Sheet::PrintList()
     printf("\nPrinting spriteList:\n");
     for (std::list<Sprite_Sheet*>::iterator i = spriteSheetList.begin(); i != spriteSheetList.end(); i++)
     {
-        printf("    List value %i is %i\n", j, (*i));
+        printf("    List value %i is %i\n", j, (int)(*i));
         j++;
     }
 }

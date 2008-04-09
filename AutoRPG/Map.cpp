@@ -80,8 +80,11 @@ Map::Map(std::string mapFile, std::string pictureFile)
 
 Map::~Map()
 {
-    spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
-        //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+    if (spriteSheet != NULL)
+    {
+        spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
+            //keep track of how many users are using it. If that number drops to zero, it deletes itself.
+    }
 }
 
 void Map::LoadFiles(std::string mapFile, std::string pictureFile)
@@ -92,7 +95,7 @@ void Map::LoadFiles(std::string mapFile, std::string pictureFile)
         spriteSheet->RemoveUser();  //This function is for memory management. This particular instance of spriteSheet will always
             //keep track of how many users are using it. If that number drops to zero, it deletes itself.
     }
-    for (int i = 0; i < spriteIds.size(); i++)
+    for (unsigned int i = 0; i < spriteIds.size(); i++)
     {
         spriteIds[i].resize(0); //Delete all of the current indexes
     }

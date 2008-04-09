@@ -27,6 +27,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Event.h"
 #include "Area.h"
 #include "Fake_Server.h"
+#include "Graphics.h"
 
 #include <SDL/SDL.h>
 #include <map>
@@ -42,9 +43,11 @@ private:
     Fake_Server* server;
     Character* player;
 
-    SDL_Surface* screen;
-    SDL_Surface* dynamicLayer;
+//    SDL_Surface* screen;
+//    SDL_Surface* dynamicLayer;
     Map* map;
+
+    Graphics* graphics;
 
     //Key mappings
     SDLKey moveUp;
@@ -52,15 +55,20 @@ private:
     SDLKey moveLeft;
     SDLKey moveRight;
 public:
-    Client(Fake_Server* theServer, int clientId, SDL_Surface* theScreen);
+    Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, SDL_Surface* theDynamicLayer,*/ Graphics* theGraphics);
     ~Client();
+    void LoadMap(std::string indexFile, std::string tileFile);
     bool Update();
+    bool UpdateEvents();
+    bool UpdatePositions();
     void SetKeys(SDLKey keyUp, SDLKey keyDown, SDLKey keyLeft, SDLKey keyRight);
 	int GetId();
+	Character* GetPlayer();
     bool Connect(int characterId);  //Connects to the server using character with id characterId
 	void RegisterEvent(std::string event);  //Let the Client know that an event has occurred
 	void SendEventToServer(std::string event);  //Send a serialized event to server - often occurs in tandem with the function above
     bool PollEvent();   //Process the next event in eventManager. Returns false if there are no more events to poll
+    bool PeekEvent();   //Return whether or not there is an event to Poll
     void HandleInput(SDL_Event SDLEvent);   //Handle the input from SDL, such as keypresses and mouse clicks
 };
 

@@ -40,7 +40,7 @@ Fake_Server::Fake_Server(std::string filename)
     while (!inFile.eof())
     {
         getline(inFile, line);
-        Character* newCharacter = new Character(line);
+        Character* newCharacter = new Character(line, NULL);
         world->AddCharacter(newCharacter);
         i++;
     }
@@ -145,7 +145,7 @@ std::string Fake_Server::RegisterClient(Client* theClient, int characterId)
 	    }
 	    toSend += "Error\nError";
 	}
-	toSend += "\n";
+	toSend += "\nEND_\n";
 	toSend += "Characters:\n";
     for (std::map<int, Character*>::iterator i = world->GetCharacterMap()->begin(); i != world->GetCharacterMap()->end(); i++)
     {

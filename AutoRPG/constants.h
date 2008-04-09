@@ -25,8 +25,8 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 #include <string>
 
-const bool DEBUG_SHOWALL = false;
-const bool DEBUG_SHOWFPS = false;
+const bool DEBUG_SHOWALL = true;
+const bool DEBUG_SHOWFPS = true;
 const bool DEBUG_SHOWEVENTS = false;
 const bool DEBUG_SHOWERRORS = true;
 

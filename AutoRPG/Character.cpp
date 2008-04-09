@@ -19,7 +19,6 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "Character.h"
-#include "Instance.h"
 #include "Graphics.h"
 #include "Conversions.h"
 #include "Event.h"
@@ -37,8 +36,6 @@ Character::Character(int areaId, int locx, int locy, int width, int height, SDL_
 	pos.y = locy;
 	dim.x = width;
 	dim.y = height;
-	init.x = locx;
-	init.y = locy;
 	vel.x = 0;
 	vel.y = 0;
 
@@ -47,6 +44,18 @@ Character::Character(int areaId, int locx, int locy, int width, int height, SDL_
 
 	destination = destinationSurface;
 	lastTime = SDL_GetTicks();
+
+	totalMagic = 100;
+	totalHealth = 100;
+	remainingMagic = 100;
+	remainingHealth = 100;
+
+	healthMeter = new Meter(40, 4, 255, 0, 0);
+	healthMeter->SetPercent((remainingHealth * 100.0)/totalHealth);
+	magicMeter = new Meter(40, 4, 0, 255, 0);
+	magicMeter->SetPercent((remainingMagic * 100.0)/totalMagic);
+
+	target = NULL;
 
 	animList.clear();	//Just make sure that these are all clear
 	//flagList.clear();
@@ -118,12 +127,9 @@ Character::Character(int areaId, int locx, int locy, int width, int height, SDL_
 
     ChangeAnimation(&animList[ANIM_STILLRIGHT]);   //Always begin facing right, although this should be changed almost immediately
         //in almost all circumstances
-
-    fpsTicks = SDL_GetTicks();
-    fpsFrames = 0;
 }
 
-Character::Character(std::string serialized)
+Character::Character(std::string serialized, SDL_Surface* destinationSurface)
 {
 	flagList.push_back(1);	//Facing flag: 1-left, 2-right, 3-up, 4-down
 	flagList.push_back(0);	//AutoPilot flag: 0-off, 1-on
@@ -164,8 +170,20 @@ Character::Character(std::string serialized)
 	inString >> temp;
 	clientId = Conversions::StringToInt(temp);
 
-	destination = NULL;
+	destination = destinationSurface;
 	lastTime = SDL_GetTicks();
+
+	totalMagic = 100;
+	totalHealth = 100;
+	remainingMagic = 100;
+	remainingHealth = 100;
+
+	healthMeter = new Meter(40, 4, 255, 0, 0);
+	healthMeter->SetPercent((remainingHealth * 100.0)/totalHealth);
+	magicMeter = new Meter(40, 4, 0, 255, 0);
+	magicMeter->SetPercent((remainingMagic * 100.0)/totalMagic);
+
+	target = NULL;
 
 	animList.clear();	//Just make sure that these are all clear
 
@@ -236,9 +254,18 @@ Character::Character(std::string serialized)
 
     ChangeAnimation(&animList[ANIM_STILLRIGHT]);   //Always begin facing right, although this should be changed almost immediately
         //in almost all circumstances
+}
 
-    fpsTicks = SDL_GetTicks();
-    fpsFrames = 0;
+Character::~Character()
+{
+    if (healthMeter != NULL)
+    {
+        delete healthMeter;
+    }
+    if (magicMeter != NULL)
+    {
+        delete magicMeter;
+    }
 }
 
 void Character::AddAnimation(std::vector<int> animation, std::string filename)
@@ -258,16 +285,6 @@ void Character::ChangeAnimation(Animation* animation)
 void Character::UpdatePosition()
 {
     double secsPassed = (SDL_GetTicks() - lastTime)/1000.0;
-    fpsFrames++;
-    if (SDL_GetTicks() - fpsTicks > 1000)
-    {
-        if (DEBUG_SHOWALL || DEBUG_SHOWFPS)
-        {
-            printf("Frames per second is %f\n", fpsFrames/((SDL_GetTicks() - fpsTicks)/1000.0));
-        }
-        fpsTicks = SDL_GetTicks();
-        fpsFrames = 0;
-    }
 	pos.x += vel.x * secsPassed;
 	pos.y += vel.y * secsPassed;
 
@@ -296,6 +313,9 @@ void Character::UpdatePosition()
 void Character::UpdateAnimation()
 {
     currentAnim->ApplyCurrentSprite(pos.x, pos.y, destination);
+
+    healthMeter->ApplyToSurface(pos.x + 4, pos.y - 8, destination);
+    magicMeter->ApplyToSurface(pos.x + 4, pos.y - 4, destination);
 
 	lastTime = SDL_GetTicks();  //Update the lastTime function
 }
@@ -330,6 +350,11 @@ int Character::GetClientId()
 int Character::GetAreaId()
 {
     return currentAreaId;
+}
+
+Character* Character::GetTarget()
+{
+    return target;
 }
 
 void Character::AssignClient(int theClientId)
@@ -436,7 +461,7 @@ void Character::Move(std::string info)
 {
     if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
     {
-        printf("Character %i was told to move via an event. Character is now at position ", id);
+        printf("Character %i (client %i) was told to move via an event. Character is now at position ", id, clientId);
     }
     std::stringstream inStream;
     inStream.str(info);
@@ -572,7 +597,7 @@ void Character::StopMove(std::string info)
 {
     if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
     {
-        printf("Character %i was told to stop moving via an event. Character is now at position ", id);
+        printf("Character %i (client %i) was told to stop moving via an event. Character is now at position ", id, clientId);
     }
     std::stringstream inStream;
     inStream.str(info);
@@ -676,6 +701,83 @@ void Character::StopMoveVert(bool addEvent /*=true*/)
     {
         eventQueue.push(Event::Serialize("StopMove", id,"Direction: Vert xPos: " + Conversions::IntToString(pos.x) + " yPos: " + Conversions::IntToString(pos.y)));
     }
+}
+
+void Character::ChangeTarget(Character* theTarget, bool addEvent /* = true */)
+{
+    target = theTarget;
+
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("ChangeTarget", id, "New_Target: " + Conversions::IntToString(target->id)));
+    }
+}
+
+void Character::ChangeTarget(std::string info, Character* theTarget)
+{
+    ChangeTarget(theTarget, false);
+}
+
+void Character::Attack(bool addEvent /* = true */)
+{
+    //For now, this is overly simplified, just do 10 damage
+    if (target == NULL)
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWERRORS)
+        {
+            printf("Error: Character with id %i (client %i) attempted to attack a NULL\n", id, clientId);
+        }
+        return;
+    }
+
+    target->TakeDamage(10);
+
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("Attack", id, "NULL"));
+    }
+}
+
+void Character::Attack(std::string info)
+{
+    Attack(false);
+}
+
+void Character::Defend(bool addEvent /* = true */)
+{
+}
+
+void Character::Defend(std::string info)
+{
+}
+
+void Character::TakeDamage(int amount, bool addEvent /* = true */)
+{
+    printf("Processing the TakeDamage function, not triggered by event, for character %i (client %i)\n", id, clientId);
+    remainingHealth -= amount;
+    printf("Remaining health is now %i\n", remainingHealth);
+    if (remainingHealth <= 0)
+    {
+        //Make them dead here...somehow
+        remainingHealth = 0;
+    }
+    healthMeter->SetPercent((remainingHealth * 100)/totalHealth);
+
+    if (addEvent)
+    {
+        eventQueue.push(Event::Serialize("TakeDamage", id, "Amount: " + Conversions::IntToString(amount)));
+    }
+}
+
+void Character::TakeDamage(std::string info)
+{
+    printf("Processing the TakeDamage function, triggered by an event, for character %i (client %i)\n", id, clientId);
+    std::stringstream inString;
+    inString.str(info);
+    std::string temp = "";
+    inString >> temp;   //Should read "Amount:"
+    inString >> temp;   //Should be the amount
+    TakeDamage(Conversions::StringToInt(temp), false);
 }
 
 Point Character::GetVelocity()

@@ -1,20 +1,20 @@
 /*
 Copyright 2007, 2008 Andrew Allen and Brian Shourd
 
-This file is part of AutoRPG.
+This file is part of Coralstone.
 
-AutoRPG is free software: you can redistribute it and/or modify
+Coralstone is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AutoRPG is distributed in the hope that it will be useful,
+Coralstone is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with AutoRPG (Called LICENSE.txt).  If not, see
+along with Coralstone (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
@@ -48,10 +48,11 @@ int main(int argc, char *args[])
     Client client2(&server, 2, NULL);
     if (!client1.Connect(1)) {return 1;}
     if (!client2.Connect(2)) {return 1;}
-    client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d);
+    client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_q, SDLK_e);
 
     //This area reserved for testing experiments
-    client1.GetPlayer()->ChangeTarget(client2.GetPlayer());
+//    client1.GetPlayer()->ChangeTarget(client2.GetPlayer());
+//    client1.GetPlayer()->Attack();
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -65,9 +66,6 @@ int main(int argc, char *args[])
 			{
 				switch (SDLEvent.key.keysym.sym)
 				{
-                case SDLK_SPACE:
-                    client1.GetPlayer()->Attack();
-                    break;
 				case SDLK_ESCAPE:   //Escape pressed
 					quit = true;
 					break;
@@ -95,7 +93,7 @@ int main(int argc, char *args[])
 bool Init()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
-    if (SDLNet_Init() == -1)
+/*    if (SDLNet_Init() == -1)
     {
         printf("Error with init\n");
         return false;
@@ -107,7 +105,7 @@ bool Init()
         return false;
     }
     IPaddress ip;
-/*    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
+    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
     {
         printf("Error with connect\n");
         return false;
@@ -123,6 +121,6 @@ bool Init()
         printf("Error with add socket\n");
         return false;
     }*/
-    SDL_WM_SetCaption("AutoRPG - Development", NULL);
+    SDL_WM_SetCaption("Coralstone - Development", NULL);
     return true;
 }

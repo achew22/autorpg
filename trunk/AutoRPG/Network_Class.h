@@ -28,11 +28,10 @@ class Network_Class
 {
     public:
         Network_Class();
-        bool connect(std::string, int);
-        bool newData();
-        bool write(std::string);
-        bool ready();
-        std::string read();
+        bool Connect(std::string, int);
+        bool Write(std::string);
+        bool Ready();
+        std::string Read();
     private:
         TCPsocket sock;
         SDLNet_SocketSet set;

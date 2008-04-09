@@ -19,7 +19,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 
-#include "network_class.h"
+#include "Network_Class.h"
 #include <SDL_net.h>
 #include <stdio.h>
 #include <string>
@@ -42,7 +42,7 @@ Network_Class::Network_Class()
     }
 };
 
-bool Network_Class::connect(std::string hostname, int port)
+bool Network_Class::Connect(std::string hostname, int port)
 {
     IPaddress ip;
     //Okay this threw me for a loop -- it turns out that this function = 0 when its successful. Why? Basically it's evil
@@ -54,7 +54,7 @@ bool Network_Class::connect(std::string hostname, int port)
     sock = SDLNet_TCP_Open(&ip);
     if (!sock)
     {
-        printf("Unable to connect to %s on port %i\n", hostname, port);
+        printf("Unable to connect to %s on port %i\n", hostname.c_str(), port);
         //return false;
     }
     if (SDLNet_TCP_AddSocket(set, sock) == -1)
@@ -78,14 +78,14 @@ bool Network_Class::connect(std::string hostname, int port)
 }
 
 //If the class has something happening (i.e. data sent to it) this will return true
-bool Network_Class::ready()
+bool Network_Class::Ready()
 {
     // This little trick will return true if we're ready or false if not
     return SDLNet_CheckSockets(set, 1);
 }
 
 //Read from the network class return string
-std::string Network_Class::read()
+std::string Network_Class::Read()
 {
     char server_response[5000]; //Hopefully 5000 characters is enough to keep the whole throughput in there. This can be bumped up if necessary
     int count = SDLNet_TCP_Recv( sock, server_response, sizeof( server_response ) );
@@ -98,7 +98,7 @@ std::string Network_Class::read()
 }
 
 //Pipe text into the server and return bool
-bool Network_Class::write(std::string message)
+bool Network_Class::Write(std::string message)
 {
     message += "\r\n"; // Our messages terminate with \r\n
     return SDLNet_TCP_Send(sock, const_cast<char *>(message.c_str()), message.length() + 1); // this god awful hack is because SDLNET_TCP_Send doesn't accept a constant char * in linux but in windows it works, strange.

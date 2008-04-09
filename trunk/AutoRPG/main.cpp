@@ -51,8 +51,7 @@ int main(int argc, char *args[])
     client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_q, SDLK_e);
 
     //This area reserved for testing experiments
-//    client1.GetPlayer()->ChangeTarget(client2.GetPlayer());
-//    client1.GetPlayer()->Attack();
+    client1.ConnectRemote(1);
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;

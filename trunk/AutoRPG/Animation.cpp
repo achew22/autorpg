@@ -36,7 +36,7 @@ Animation::Animation(std::string file, int spriteW, int spriteH, std::vector<int
     }
 
     sprites.resize(spriteIndexes.size());
-    for (int i = 0; i < sprites.size(); i++)
+    for (unsigned int i = 0; i < sprites.size(); i++)
     {
         sprites[i] = spriteIndexes[i];
     }
@@ -48,7 +48,7 @@ Animation::Animation(std::string file, int spriteW, int spriteH, std::vector<int
 //Applys whatever the current sprite of the animation is to the surface in destination at the coordinates x, y
 void Animation::ApplyCurrentSprite(int x, int y, SDL_Surface* destination)
 {
-    if (SDL_GetTicks() - lastAnimTime > clipLength) //If enough time has passed
+    if (SDL_GetTicks() - lastAnimTime > (unsigned int)clipLength) //If enough time has passed
     {
         currentSprite ++;   //Go to the next sprite
         if (currentSprite == sprites.end()) //If you are at the end, go back to the beginning

@@ -18,10 +18,12 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
+#include "Conversions.h"
 #include "Event_Manager.h"
 #include "Event.h"
 
 #include <string>
+#include <sstream>
 #include <list>
 #include <map>
 #include <stdio.h>
@@ -52,6 +54,12 @@ void Event_Manager::AddEvent(Event* event)
 	eventQueue.push(event);
 }
 
+//Returns true if there is an event to poll, false otherwise
+bool Event_Manager::PeekEvent()
+{
+    return !eventQueue.empty();
+}
+
 //Process the next event in the queue. Returns false if there are no events to poll.
 bool Event_Manager::PollEvent()
 {
@@ -77,10 +85,10 @@ bool Event_Manager::PollEvent()
     //Actually handle the event
     if (event->type == "Attack")
     {
-//		whoIter->second->Attack(event->info);	//These are all special functions that take in serialized data, then deserialize it and
+		whoIter->second->Attack(event->info);	//These are all special functions that take in serialized data, then deserialize it and
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Attacked!\n", event->who_id);
+            printf("Character with id %i (client %i) Attacked!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "Move")
@@ -88,7 +96,7 @@ bool Event_Manager::PollEvent()
 		whoIter->second->Move(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Moved!\n", event->who_id);
+            printf("Character with id %i (client %i) Moved!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "StopMove")
@@ -96,7 +104,20 @@ bool Event_Manager::PollEvent()
         whoIter->second->StopMove(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Stopped Moving!\n", event->who_id);
+            printf("Character with id %i (client %i) Stopped Moving!\n", event->who_id, whoIter->second->GetClientId());
+        }
+    }
+    else if (event->type == "ChangeTarget")
+    {
+        std::stringstream inString;
+        inString.str(event->info);
+        std::string temp = "";
+        inString >> temp;   //Should read "New_Target:"
+        inString >> temp;   //Should be the new target's id number
+        whoIter->second->ChangeTarget(event->info, characterMap->find(Conversions::StringToInt(temp))->second);
+        if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
+        {
+            printf("Character with id %i (client %i) Changed targets to character with id %s!\n", event->who_id, whoIter->second->GetClientId(),  temp.c_str());
         }
     }
     else if (event->type == "Chat")
@@ -104,7 +125,7 @@ bool Event_Manager::PollEvent()
 //		whoIter->second->Chat(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Chatted!\n", event->who_id);
+            printf("Character with id %i (client %i) Chatted!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "Defend")
@@ -112,15 +133,15 @@ bool Event_Manager::PollEvent()
 //		whoIter->second->Defend(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Defended!\n", event->who_id);
+            printf("Character with id %i (client %i) Defended!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "TakeDamage")
     {
-//		whoIter->second->TakeDamage(event->info);
+		whoIter->second->TakeDamage(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Took Damage!\n", event->who_id);
+            printf("Character with id %i (client %i) Took Damage!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "Death")
@@ -128,7 +149,7 @@ bool Event_Manager::PollEvent()
 //		whoIter->second->Death(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Died!\n", event->who_id);
+            printf("Character with id %i (client %i) Died!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "Spawn")
@@ -136,7 +157,7 @@ bool Event_Manager::PollEvent()
 //		characterMap.insert(characterMap.begin(), std::pair<std::string, Character*>(event->who_id, event->info));
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Spawned!\n", event->who_id);
+            printf("Character with id %i (client %i) Spawned!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "Jump")
@@ -144,7 +165,7 @@ bool Event_Manager::PollEvent()
         whoIter->second->Jump(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i Jumped!\n", event->who_id);
+            printf("Character with id %i (client %i) Jumped!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else if (event->type == "StopJump")
@@ -152,14 +173,14 @@ bool Event_Manager::PollEvent()
         whoIter->second->StopJump(event->info);
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
-            printf("Character with id %i stopped jumping!\n", event->who_id);
+            printf("Character with id %i (client %i) stopped jumping!\n", event->who_id, whoIter->second->GetClientId());
         }
     }
     else
     {
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS || DEBUG_SHOWERRORS)
         {
-            printf("The event type is unknown - type is %i\n", event->type);
+            printf("The event type is unknown - type is %s\n", event->type.c_str());
         }
     }
 

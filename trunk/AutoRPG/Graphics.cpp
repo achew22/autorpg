@@ -21,6 +21,23 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 #include "Graphics.h"
 #include "constants.h"
 #include <string>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+
+Graphics::Graphics()
+{
+    screen = NULL;
+    dynamicLayer = NULL;
+    player = NULL;
+    map = NULL;
+
+    fpsTicks = fpsFrames = lastTime = 0;
+}
+
+Graphics::~Graphics()
+{
+    CleanUp();
+}
 
 //Load the image at filename with the color specified by red, green, and blue as the transparent color. The default
 //transparency color is bright blue, so it needn't be specified. Returns a pointer to this created surface
@@ -55,9 +72,23 @@ void Graphics::ApplyImage(int x, int y, SDL_Surface *source, SDL_Surface *destin
 //Initialize the SDL libraries to be used, returns false if it fails
 bool Graphics::Init()
 {
+//    if (SDL_Init(SDL_INIT_VIDEO) == -1) {return false;}
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF/* | SDL_NOFRAME*/);
     if (screen == NULL) {return false;}
+    dynamicLayer = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, NULL, NULL, NULL, NULL);
+    if (dynamicLayer == NULL) {return false;}
+//    SDL_WM_SetCaption("AutoRPG - Development", NULL);
     return true;
+}
+
+void Graphics::SetPlayer(Character* thePlayer)
+{
+    player = thePlayer;
+}
+
+void Graphics::SetMap(Map* theMap)
+{
+    map = theMap;
 }
 
 SDL_Surface* Graphics::GetScreen()
@@ -65,15 +96,90 @@ SDL_Surface* Graphics::GetScreen()
     return screen;
 }
 
+SDL_Surface* Graphics::GetDynamicLayer()
+{
+    return dynamicLayer;
+}
+
 //Updates the main screen, this way everything is hunky-dory and the screen only gets flipped once per frame
 bool Graphics::Update()
 {
+    //First, sort the characters by layer, so that they can be updated in proper relation to each other
+        //We only do one pass to save time, so we assume that not much changes in between frames
+    for (unsigned int i = 0; i < characterArray.size() - 1; i++)
+    {
+        if (characterArray[i]->GetPosition().y >characterArray[i + 1]->GetPosition().y)
+        {
+            Character* temp = characterArray[i];
+            characterArray[i] = characterArray[i + 1];
+            characterArray[i + 1] = temp;
+        }
+    }
+
+    //Now clear the screen
+    SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+
+    //Set the camera here
+  	SDL_Rect screenLocation;	//Defines essentially where the camera is at
+	screenLocation.h = SCREEN_HEIGHT;
+	screenLocation.w = SCREEN_WIDTH;
+	screenLocation.y = 0;
+
+	//Keep the screenLocation relative to the player's position
+	if (player != NULL)
+	{
+		Point pos = player->GetPosition();
+		screenLocation.x = pos.x - (SCREEN_WIDTH - 48)/2;
+		screenLocation.y = pos.y - (SCREEN_HEIGHT - 64)/2;
+	}
+	else
+	{
+		screenLocation.x = 0;
+	}
+
+	//Apply the map to the screen
+	if (map != NULL)
+	{
+        map->ApplyMap(screenLocation.x, screenLocation.y, SCREEN_HEIGHT, SCREEN_WIDTH, dynamicLayer);
+	}
+
+    //Frames per second calculator
+    fpsFrames++;
+    if (SDL_GetTicks() - fpsTicks > 1000)
+    {
+        if (DEBUG_SHOWALL || DEBUG_SHOWFPS)
+        {
+            printf("Frames per second is %f\n", fpsFrames/((SDL_GetTicks() - fpsTicks)/1000.0));
+        }
+        fpsTicks = SDL_GetTicks();
+        fpsFrames = 0;
+    }
+
+    //Lastly, draw the characters
+    for (unsigned int i = 0; i < characterArray.size(); i++)
+    {
+        characterArray[i]->UpdatePosition();
+        characterArray[i]->UpdateAnimation();
+    }
+
+    //Apply the dynamicLayer to the screen
+	ApplyImage(0, 0, dynamicLayer, screen, &screenLocation);
+
 	//Flip the buffers and return false if this fails
 	if (SDL_Flip(screen) == -1) {return false;}
     return true;
 }
 
+void Graphics::AddCharacter(Character* character)
+{
+    characterArray.push_back(character);
+}
+
 void Graphics::CleanUp()
 {
+    if (dynamicLayer != NULL)
+    {
+        SDL_FreeSurface(dynamicLayer);
+    }
     SDL_Quit();
 }

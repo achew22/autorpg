@@ -39,6 +39,7 @@ public:
     ~Event_Manager();
     void AddEvent(std::string eventSerial);
 	void AddEvent(Event* event);
+	bool PeekEvent();
 	bool PollEvent();
 };
 

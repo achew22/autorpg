@@ -19,21 +19,22 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 */
 
 #include "Client.h"
+#include "Graphics.h"
 
 #include <string>
 #include <sstream>
 #include <SDL/SDL.h>
 
-Client::Client(Fake_Server* theServer, int clientId, SDL_Surface* theScreen)
+Client::Client(Fake_Server* theServer, int clientId, /*SDL_Surface* theScreen, SDL_Surface* theDynamicLayer,*/ Graphics* theGraphics)
 {
     id = clientId;
     server = theServer;
     eventManager = new Event_Manager(&characterMap);
     player = NULL;
 
-    screen = theScreen;
-    dynamicLayer = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, NULL, NULL, NULL, NULL);
     map = NULL;
+
+    graphics = theGraphics;
 
     moveUp = SDLK_UP;
     moveDown = SDLK_DOWN;
@@ -44,14 +45,31 @@ Client::Client(Fake_Server* theServer, int clientId, SDL_Surface* theScreen)
 Client::~Client()
 {
     delete eventManager;
-    SDL_FreeSurface(dynamicLayer);
     if (map != NULL)
     {
         delete map;
     }
 }
 
+void Client::LoadMap(std::string indexFile, std::string tileFile)
+{
+    if (map != NULL)
+    {
+        delete map;
+    }
+    map = new Map(indexFile, tileFile);
+    //map->AssignSpriteSheet(50, 50, tileFile);
+}
+
 bool Client::Update()
+{
+    return UpdateEvents() && UpdatePositions();
+}
+
+//This function will only handle events coming in and going out. Seperation is needed to determine the difference between
+    //the clients that may not need to update graphics (ie testing multiple clients on one computer). Basically, except for
+    //testing purposes, just use Update()
+bool Client::UpdateEvents()
 {
     std::string event = player->PollEvent();
 
@@ -67,20 +85,27 @@ bool Client::Update()
     }
 
     //Now process all of the events that the server sent to the client
-    while (PollEvent())
+    while (PeekEvent())
     {
         if (DEBUG_SHOWALL || DEBUG_SHOWEVENTS)
         {
             printf("Client %i is polling an event that occurred\n", id);
         }
+        PollEvent();
     }
 
-    //Now update the positions of all of the characters that it knows of
+    return true;
+}
+
+//Only update the positions of all of the characters. THis is used for testing purposes only, if you wish
+    //to perform an update of the client, use Update() instead.
+    //Used in conjunction with UpdateEvents()
+bool Client::UpdatePositions()
+{
     for (std::map<int, Character*>::iterator i = characterMap.begin(); i != characterMap.end(); i++)
     {
         i->second->UpdatePosition();
     }
-
     return true;
 }
 
@@ -97,6 +122,11 @@ int Client::GetId()
 	return id;
 }
 
+Character* Client::GetPlayer()
+{
+    return player;
+}
+
 //Attempt to connect to the server and take control of the character with id characterId
 bool Client::Connect(int characterId)
 {
@@ -111,16 +141,34 @@ bool Client::Connect(int characterId)
     getline(setupStream, line); //Should read 'Map:'
     getline(setupStream, mapfile); //Should read 'mapfile.txt'
     getline(setupStream, picfile); //Should read 'picturefile.png'
+    getline(setupStream, line); //Should read 'END_'
     map = new Map(mapfile, picfile);
+    if (graphics != NULL)
+    {
+        graphics->SetMap(map);
+    }
     getline(setupStream, line); //Shoud read 'Characters:'
     getline(setupStream, line); //Should be the serialized version of the first character
+    SDL_Surface* dynamicLayer = NULL;
+    if (graphics != NULL)
+    {
+        dynamicLayer = graphics->GetDynamicLayer();
+    }
     while (line != "END_")
     {
-        Character* tempChar = new Character(line);
+        Character* tempChar = new Character(line, dynamicLayer);
         characterMap.insert(std::pair<int, Character*>(tempChar->GetId(), tempChar));
+        if (graphics != NULL)
+        {
+            graphics->AddCharacter(tempChar);
+        }
         getline(setupStream, line);
     }
     player = characterMap.find(characterId)->second;
+    if (graphics != NULL)
+    {
+        graphics->SetPlayer(player);
+    }
     return true;
 }
 
@@ -134,9 +182,16 @@ void Client::SendEventToServer(std::string event)
     server->RegisterEvent(event, id);
 }
 
+//Poll an event
 bool Client::PollEvent()
 {
     return eventManager->PollEvent();
+}
+
+//Check if there is an event to Poll
+bool Client::PeekEvent()
+{
+    return eventManager->PeekEvent();
 }
 
 void Client::HandleInput(SDL_Event SDLEvent)
@@ -159,6 +214,10 @@ void Client::HandleInput(SDL_Event SDLEvent)
         else if (keyPressed == moveUp)    //Up button pressed
         {
             player->MoveUp();
+        }
+        else if (keyPressed == SDLK_SPACE)
+        {
+            player->Attack(player->GetTarget());
         }
     }
     else if (SDLEvent.type == SDL_KEYUP)

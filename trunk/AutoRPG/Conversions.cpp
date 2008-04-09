@@ -59,14 +59,14 @@ int Conversions::StringToInt(std::string toConvert)
     //If the string is a negative number
     if (toConvert[0] == '-')
     {
-        for (int i = 0; i < toConvert.size() - 1; i++)
+        for (unsigned int i = 0; i < toConvert.size() - 1; i++)
         {
             toReturn += (int)((toConvert[toConvert.size()-i-1]-'0')*pow(10.0, i));
         }
         return toReturn * -1;
     }
     //If the string is a positive number
-    for (int i = 0; i < toConvert.size(); i++)
+    for (unsigned int i = 0; i < toConvert.size(); i++)
     {
         toReturn += (int)((toConvert[toConvert.size()-i-1]-'0')*pow(10.0, i));
     }

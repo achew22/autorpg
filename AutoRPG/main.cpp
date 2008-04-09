@@ -107,7 +107,7 @@ bool Init()
         return false;
     }
     IPaddress ip;
-    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
+/*    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
     {
         printf("Error with connect\n");
         return false;
@@ -122,6 +122,7 @@ bool Init()
     {
         printf("Error with add socket\n");
         return false;
-    }
+    }*/
     SDL_WM_SetCaption("AutoRPG - Development", NULL);
+    return true;
 }

@@ -20,7 +20,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 
 
 #include "Network_Class.h"
-#include <SDL_net.h>
+#include <SDL/SDL_net.h>
 #include <stdio.h>
 #include <string>
 

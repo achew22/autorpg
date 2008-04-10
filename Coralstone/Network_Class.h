@@ -21,7 +21,7 @@ along with AutoRPG (Called LICENSE.txt).  If not, see
 <http://www.gnu.org/licenses/>.
 */
 
-#include <SDL_net.h>
+#include <SDL/SDL_net.h>
 #include <string>
 
 class Network_Class

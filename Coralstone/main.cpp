@@ -35,7 +35,7 @@ TCPsocket sock;
 
 bool Init();
 
-int main(int argc, char *args[])
+int main(int argc, char* argv[])
 {
     if (!Init()) {return 1;}
     Graphics graphics;
@@ -51,7 +51,7 @@ int main(int argc, char *args[])
     client2.SetKeys(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_q, SDLK_e);
 
     //This area reserved for testing experiments
-    client1.ConnectRemote(1);
+    //client1.ConnectRemote(1);
 
 	SDL_Event SDLEvent; //The main event for polling and what-not
     bool quit = false;
@@ -92,34 +92,6 @@ int main(int argc, char *args[])
 bool Init()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1) {return false;}
-/*    if (SDLNet_Init() == -1)
-    {
-        printf("Error with init\n");
-        return false;
-    }
-    set = SDLNet_AllocSocketSet(1);
-    if (!set)
-    {
-        printf("Error with set\n");
-        return false;
-    }
-    IPaddress ip;
-    if (!SDLNet_ResolveHost(&ip, ADDRESS.c_str(), PORT))
-    {
-        printf("Error with connect\n");
-        return false;
-    }
-    sock = SDLNet_TCP_Open(&ip);
-    if (!sock)
-    {
-        printf("Error with sock\n");
-        return false;
-    }
-    if (SDLNet_TCP_AddSocket(set, sock) == -1)
-    {
-        printf("Error with add socket\n");
-        return false;
-    }*/
     SDL_WM_SetCaption("Coralstone - Development", NULL);
     return true;
 }
